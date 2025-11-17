@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useConfigStore } from "@/stores/configStore"
 import { useToast } from "@/contexts/ToastContext"
 import Button from "@/components/common/Button"
-import LoadingButton from "@/components/common/LoadingButton"
+import LoadingButton from "@/components/common/LoandingButton"
 import { ReceiptPercentIcon } from "@heroicons/react/24/outline"
 
 const TicketConfigTab = () => {
