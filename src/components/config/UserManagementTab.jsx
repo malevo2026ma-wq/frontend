@@ -20,7 +20,7 @@ import {
 } from "@heroicons/react/24/outline"
 
 const UserManagementTab = () => {
-  const toast = useToast()
+  const { showToast, error: toastError } = useToast()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -46,7 +46,7 @@ const UserManagementTab = () => {
     if (result.success) {
       setUsers(result.data)
     } else {
-      toast.error(result.error, { title: "Error al cargar usuarios" })
+      showToast(result.error, "error", { title: "Error al cargar usuarios" })
     }
     
     setLoading(false)
@@ -78,15 +78,15 @@ const UserManagementTab = () => {
         result = await userService.updateUser(editingUser.id, updateData)
         
         if (result.success) {
-          toast.success("Usuario actualizado correctamente", {
-            title: "Usuario actualizado",
+          showToast("Usuario actualizado correctamente", "success", {
+            title: "Usuario actualizado"
           })
         }
       } else {
         // Crear nuevo usuario
         if (!formData.password || formData.password.length < 6) {
-          toast.error("La contraseña debe tener al menos 6 caracteres", {
-            title: "Error de validación",
+          showToast("La contraseña debe tener al menos 6 caracteres", "error", {
+            title: "Error de validación"
           })
           setSubmitting(false)
           return
@@ -95,8 +95,8 @@ const UserManagementTab = () => {
         result = await userService.createUser(formData)
         
         if (result.success) {
-          toast.success("Usuario creado correctamente", {
-            title: "Usuario creado",
+          showToast("Usuario creado correctamente", "success", {
+            title: "Usuario creado"
           })
         }
       }
@@ -105,12 +105,12 @@ const UserManagementTab = () => {
         await loadUsers()
         resetForm()
       } else {
-        toast.error(result.error, {
-          title: editingUser ? "Error al actualizar" : "Error al crear",
+        showToast(result.error, "error", {
+          title: editingUser ? "Error al actualizar" : "Error al crear"
         })
       }
     } catch (error) {
-      toast.error("Error inesperado", { title: "Error" })
+      showToast("Error inesperado", "error", { title: "Error" })
     } finally {
       setSubmitting(false)
     }
@@ -146,12 +146,14 @@ const UserManagementTab = () => {
       const result = await userService.deleteUser(user.id)
       
       if (result.success) {
-        toast.success("Usuario eliminado correctamente", {
-          title: "Usuario eliminado",
+        showToast("Usuario eliminado correctamente", "success", {
+          title: "Usuario eliminado"
         })
         await loadUsers()
       } else {
-        toast.error(result.error, { title: "Error al eliminar" })
+        showToast(result.error, "error", {
+          title: "Error al eliminar"
+        })
       }
     }
   }

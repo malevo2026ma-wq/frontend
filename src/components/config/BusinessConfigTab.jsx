@@ -2,12 +2,12 @@ import { useState, useEffect } from "react"
 import { useConfigStore } from "@/stores/configStore"
 import { useToast } from "@/contexts/ToastContext"
 import Button from "@/components/common/Button"
-import LoadingButton from "@/components/common/LoandingButton"
+import LoadingButton from "@/components/common/LoadingButton"
 import { BuildingStorefrontIcon } from "@heroicons/react/24/outline"
 
 const BusinessConfigTab = () => {
   const { businessConfig, updateBusinessConfig, fetchBusinessConfig, loading } = useConfigStore()
-  const toast = useToast()
+  const { showToast } = useToast()
   const [formData, setFormData] = useState(businessConfig)
 
   useEffect(() => {
@@ -32,16 +32,12 @@ const BusinessConfigTab = () => {
     const result = await updateBusinessConfig(formData)
     
     if (result?.success) {
-      toast.showToast({
-        type: "success",
-        title: "Configuración guardada",
-        message: "Los datos del negocio se han actualizado correctamente"
+      showToast("Los datos del negocio se han actualizado correctamente", "success", {
+        title: "Configuración guardada"
       })
     } else {
-      toast.showToast({
-        type: "error",
-        title: "Error",
-        message: result?.error || "No se pudo actualizar la configuración"
+      showToast(result?.error || "No se pudo actualizar la configuración", "error", {
+        title: "Error"
       })
     }
   }

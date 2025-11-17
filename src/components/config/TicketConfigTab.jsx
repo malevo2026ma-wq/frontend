@@ -2,12 +2,12 @@ import { useState, useEffect } from "react"
 import { useConfigStore } from "@/stores/configStore"
 import { useToast } from "@/contexts/ToastContext"
 import Button from "@/components/common/Button"
-import LoadingButton from "@/components/common/LoandingButton"
+import LoadingButton from "@/components/common/LoadingButton"
 import { ReceiptPercentIcon } from "@heroicons/react/24/outline"
 
 const TicketConfigTab = () => {
   const { ticketConfig, updateTicketConfig, fetchTicketConfig, loading } = useConfigStore()
-  const toast = useToast()
+  const { showToast } = useToast()
   const [formData, setFormData] = useState(ticketConfig)
 
   useEffect(() => {
@@ -32,16 +32,12 @@ const TicketConfigTab = () => {
     const result = await updateTicketConfig(formData)
     
     if (result?.success) {
-      toast.showToast({
-        type: "success",
-        title: "Configuración guardada",
-        message: "La configuración de tickets se ha actualizado correctamente"
+      showToast("La configuración de tickets se ha actualizado correctamente", "success", {
+        title: "Configuración guardada"
       })
     } else {
-      toast.showToast({
-        type: "error",
-        title: "Error",
-        message: result?.error || "No se pudo actualizar la configuración"
+      showToast(result?.error || "No se pudo actualizar la configuración", "error", {
+        title: "Error"
       })
     }
   }

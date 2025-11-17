@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useConfigStore } from "@/stores/configStore"
 import { useToast } from "@/contexts/ToastContext"
 import Button from "@/components/common/Button"
-import LoadingButton from "@/components/common/LoandingButton"
+import LoadingButton from "@/components/common/LoadingButton"
 import ticketPrintService from "@/services/ticketPrintService"
 import {
   XMarkIcon,
@@ -14,7 +14,7 @@ import {
 
 const TicketPrintModal = ({ isOpen, onClose, saleData }) => {
   const { businessConfig, ticketConfig, fetchBusinessConfig, fetchTicketConfig } = useConfigStore()
-  const toast = useToast()
+  const { showToast } = useToast()
   const [printing, setPrinting] = useState(false)
   const [copies, setCopies] = useState(1)
 
@@ -62,20 +62,15 @@ const TicketPrintModal = ({ isOpen, onClose, saleData }) => {
         }
       }
 
-      toast.showToast({
-        type: "success",
-        title: "Ticket impreso",
-        message: copies > 1 ? `Se imprimieron ${copies} copias correctamente` : "El ticket se imprimió correctamente"
-      })
+      showToast(
+        copies > 1 ? `Se imprimieron ${copies} copias correctamente` : "El ticket se imprimió correctamente",
+        "success"
+      )
 
       onClose()
     } catch (error) {
       console.error("Error al imprimir:", error)
-      toast.showToast({
-        type: "error",
-        title: "Error al imprimir",
-        message: error.message || "No se pudo imprimir el ticket"
-      })
+      showToast(error.message || "No se pudo imprimir el ticket", "error")
     } finally {
       setPrinting(false)
     }
@@ -94,11 +89,7 @@ const TicketPrintModal = ({ isOpen, onClose, saleData }) => {
     )
 
     if (!result.success) {
-      toast.showToast({
-        type: "error",
-        title: "Error",
-        message: result.error || "No se pudo mostrar la vista previa"
-      })
+      showToast(result.error || "No se pudo mostrar la vista previa", "error")
     }
   }
 
@@ -115,17 +106,9 @@ const TicketPrintModal = ({ isOpen, onClose, saleData }) => {
     )
 
     if (result.success) {
-      toast.showToast({
-        type: "success",
-        title: "Ticket descargado",
-        message: "El ticket se descargó correctamente"
-      })
+      showToast("El ticket se descargó correctamente", "success")
     } else {
-      toast.showToast({
-        type: "error",
-        title: "Error",
-        message: result.error || "No se pudo descargar el ticket"
-      })
+      showToast(result.error || "No se pudo descargar el ticket", "error")
     }
   }
 
