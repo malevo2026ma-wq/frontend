@@ -13,6 +13,7 @@ const ProductGrid = ({ searchTerm }) => {
     useProductStore()
   const { categories } = useCategoryStore()
   const { setSelectedProduct, setShowQuantityModal, cart } = useSalesStore()
+  const [selectedIndex, setSelectedIndex] = useState(-1)
 
   useEffect(() => {
     let isMounted = true
@@ -36,6 +37,10 @@ const ProductGrid = ({ searchTerm }) => {
   const displayProducts = useMemo(() => {
     return searchResults.filter((product) => product.active)
   }, [searchResults])
+
+  useEffect(() => {
+    setSelectedIndex(window.selectedProductIndexForSearch || -1)
+  }, [window.selectedProductIndexForSearch])
 
   const handleAddToCart = (product) => {
     if (product.stock > 0) {
@@ -83,14 +88,17 @@ const ProductGrid = ({ searchTerm }) => {
       {searchTerm && searchTerm.trim().length >= 2 && (
         <>
           <div className="grid grid-cols-3 gap-4">
-            {displayProducts.map((product) => {
+            {displayProducts.map((product, index) => {
               const category = categories.find((cat) => cat.id === product.category_id)
               const cartQuantity = getCartQuantity(product.id)
+              const isSelected = index === selectedIndex
 
               return (
                 <div
                   key={product.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 relative group h-full flex flex-col"
+                  className={`bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-all duration-200 relative group h-full flex flex-col ${
+                    isSelected ? "border-blue-500 shadow-lg ring-2 ring-blue-300" : "border-gray-200"
+                  }`}
                 >
                   {cartQuantity > 0 && (
                     <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs rounded-full px-2 py-1 font-bold z-10 shadow-sm flex items-center">

@@ -6,14 +6,15 @@ import { useSalesStore } from "../../stores/salesStore"
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts"
 import { MagnifyingGlassIcon, QrCodeIcon } from "@heroicons/react/24/outline"
 
-const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, onScanDetected }, ref) => {
+const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded }, ref) => {
   const [isSearchingBarcode, setIsSearchingBarcode] = useState(false)
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm)
+  const [selectedProductIndex, setSelectedProductIndex] = useState(-1)
+  
   const inputRef = useRef(null)
   const debounceTimerRef = useRef(null)
-  const onScanDetectedRef = useRef(onScanDetected)
 
-  const { getProductByBarcode } = useProductStore()
+  const { getProductByBarcode, searchResults } = useProductStore()
   const { setSelectedProduct, setShowQuantityModal } = useSalesStore()
   const { registerFocusProductSearch } = useKeyboardShortcuts()
 
@@ -40,9 +41,14 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
   }, [searchTerm])
 
   useEffect(() => {
+    setSelectedProductIndex(-1)
+  }, [searchResults])
+
+  useEffect(() => {
     const handleCartUpdate = () => {
       setLocalSearchTerm("")
       onSearchChange("")
+      setSelectedProductIndex(-1)
       setTimeout(() => {
         inputRef.current?.focus()
       }, 100)
@@ -53,10 +59,6 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
     }
   }, [onSearchChange, onProductAdded])
 
-  useEffect(() => {
-    onScanDetectedRef.current = onScanDetected
-  }, [onScanDetected])
-
   const handleBarcodeSearch = () => {
     if (isSearchingBarcode) {
       if (localSearchTerm.trim()) {
@@ -64,12 +66,10 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
         if (product && product.active && product.stock > 0) {
           setSelectedProduct(product)
           setShowQuantityModal(true)
-          if (onScanDetectedRef.current) {
-            onScanDetectedRef.current()
-          }
           setLocalSearchTerm("")
           onSearchChange("")
           setIsSearchingBarcode(false)
+          setSelectedProductIndex(-1)
           inputRef.current?.focus()
         } else {
           alert("Producto no encontrado o sin stock")
@@ -79,6 +79,7 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
       setIsSearchingBarcode(true)
       setLocalSearchTerm("")
       onSearchChange("")
+      setSelectedProductIndex(-1)
       inputRef.current?.focus()
     }
   }
@@ -90,6 +91,31 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
       setIsSearchingBarcode(false)
       setLocalSearchTerm("")
       onSearchChange("")
+      setSelectedProductIndex(-1)
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault()
+      const activeProducts = searchResults.filter((product) => product.active)
+      if (activeProducts.length > 0) {
+        setSelectedProductIndex((prev) => 
+          prev < activeProducts.length - 1 ? prev + 1 : 0
+        )
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      const activeProducts = searchResults.filter((product) => product.active)
+      if (activeProducts.length > 0) {
+        setSelectedProductIndex((prev) => 
+          prev > 0 ? prev - 1 : activeProducts.length - 1
+        )
+      }
+    } else if (e.key === "Enter" && !isSearchingBarcode && selectedProductIndex >= 0) {
+      e.preventDefault()
+      const activeProducts = searchResults.filter((product) => product.active)
+      const selectedProduct = activeProducts[selectedProductIndex]
+      if (selectedProduct && selectedProduct.stock > 0) {
+        setSelectedProduct(selectedProduct)
+        setShowQuantityModal(true)
+      }
     }
   }
 
@@ -97,6 +123,7 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
     (e) => {
       const value = e.target.value
       setLocalSearchTerm(value)
+      setSelectedProductIndex(-1)
 
       // Limpiar timer anterior
       if (debounceTimerRef.current) {
@@ -128,8 +155,13 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
     setIsSearchingBarcode(false)
     setLocalSearchTerm("")
     onSearchChange("")
+    setSelectedProductIndex(-1)
     inputRef.current?.focus()
   }
+
+  useEffect(() => {
+    window.selectedProductIndexForSearch = selectedProductIndex
+  }, [selectedProductIndex])
 
   return (
     <div className="relative">
@@ -188,6 +220,12 @@ const ProductSearch = forwardRef(({ onSearchChange, searchTerm, onProductAdded, 
       {!isSearchingBarcode && localSearchTerm.trim().length > 0 && localSearchTerm.trim().length < 2 && (
         <div className="mt-2 text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded">
           ✍️ Escribe al menos 2 caracteres para buscar productos
+        </div>
+      )}
+
+      {!isSearchingBarcode && localSearchTerm.trim().length >= 2 && (
+        <div className="mt-2 text-xs text-gray-600 bg-gray-50 px-3 py-1 rounded">
+          ⬆️⬇️ Usa las flechas para navegar • Enter para seleccionar
         </div>
       )}
     </div>

@@ -17,11 +17,11 @@ import {
 const ProductList = ({ searchTerm }) => {
   const [sortField, setSortField] = useState("total_sold")
   const [sortDirection, setSortDirection] = useState("desc")
+  const [selectedIndex, setSelectedIndex] = useState(-1)
 
   const { searchResults, searchPagination, searchProductsForSales, loadMoreSearchResults, loading } = useProductStore()
   const { categories } = useCategoryStore()
   const { setSelectedProduct, setShowQuantityModal, cart } = useSalesStore()
-
 
   useEffect(() => {
     let isMounted = true
@@ -45,6 +45,10 @@ const ProductList = ({ searchTerm }) => {
   const displayProducts = useMemo(() => {
     return searchResults.filter((product) => product.active)
   }, [searchResults])
+
+  useEffect(() => {
+    setSelectedIndex(window.selectedProductIndexForSearch || -1)
+  }, [window.selectedProductIndexForSearch])
 
   // Filtrar, buscar y ordenar productos
   const filteredProducts = useMemo(() => {
@@ -176,12 +180,15 @@ const ProductList = ({ searchTerm }) => {
                 {filteredProducts.map((product, index) => {
                   const category = categories.find((cat) => cat.id === product.category_id)
                   const cartQuantity = getCartQuantity(product.id)
+                  const isSelected = index === selectedIndex
 
                   return (
                     <tr
                       key={product.id}
                       className={`transition-colors relative ${
-                        product.stock === 0
+                        isSelected
+                          ? "bg-blue-100 border-l-4 border-l-blue-500"
+                          : product.stock === 0
                           ? "bg-gray-50 opacity-60 cursor-not-allowed"
                           : "hover:bg-blue-50 cursor-pointer"
                       }`}
