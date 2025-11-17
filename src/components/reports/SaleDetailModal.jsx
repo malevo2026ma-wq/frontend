@@ -157,6 +157,32 @@ const SaleDetailModal = ({ isOpen, onClose, saleId, onSaleUpdated }) => {
     showToast("Descarga no disponible para tickets térmicos", "info")
   }
 
+  const handleCancelSale = async () => {
+    if (!cancelReason.trim()) {
+      showToast("Debe ingresar una razón para cancelar la venta", "error")
+      return
+    }
+
+    setCancelLoading(true)
+    try {
+      await cancelSale(sale.id, cancelReason)
+      showToast("Venta cancelada exitosamente", "success")
+      setShowCancelConfirm(false)
+      setCancelReason("")
+      
+      if (onSaleUpdated) {
+        onSaleUpdated()
+      }
+      
+      await loadSaleDetail()
+    } catch (error) {
+      console.error("Error al cancelar venta:", error)
+      showToast(error.response?.data?.message || "Error al cancelar la venta", "error")
+    } finally {
+      setCancelLoading(false)
+    }
+  }
+
   const getPaymentMethodIcon = (method) => {
     switch (method) {
       case "efectivo":
