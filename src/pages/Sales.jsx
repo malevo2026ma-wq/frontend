@@ -18,6 +18,7 @@ const Sales = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const { fetchCategories } = useCategoryStore()
   const { initializeStore: initializeCustomerStore } = useCustomerStore()
+  const searchInputRef = useRef(null)
 
   const isInitialized = useRef(false)
 
@@ -39,6 +40,12 @@ const Sales = () => {
         await Promise.allSettled(promises)
 
         console.log("✅ Datos iniciales cargados")
+        
+        if (searchInputRef.current) {
+          setTimeout(() => {
+            searchInputRef.current?.focus()
+          }, 300)
+        }
       } catch (error) {
         console.error("❌ Error loading initial data:", error)
       }
@@ -99,7 +106,11 @@ const Sales = () => {
         <div className="lg:col-span-2 space-y-4">
           {/* Buscador */}
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <ProductSearch onSearchChange={handleSearchChange} searchTerm={searchTerm} />
+            <ProductSearch 
+              ref={searchInputRef}
+              onSearchChange={handleSearchChange} 
+              searchTerm={searchTerm} 
+            />
           </div>
 
           {/* Grid/Lista de productos */}

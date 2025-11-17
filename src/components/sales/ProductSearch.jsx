@@ -1,20 +1,31 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useState, useRef, useCallback, useEffect, forwardRef } from "react"
 import { useProductStore } from "../../stores/productStore"
 import { useSalesStore } from "../../stores/salesStore"
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts"
 import { MagnifyingGlassIcon, QrCodeIcon } from "@heroicons/react/24/outline"
 
-const ProductSearch = ({ onSearchChange, searchTerm }) => {
+const ProductSearch = forwardRef(({ onSearchChange, searchTerm }, ref) => {
   const [isSearchingBarcode, setIsSearchingBarcode] = useState(false)
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm)
+  const [lastSearchResults, setLastSearchResults] = useState([])
   const inputRef = useRef(null)
   const debounceTimerRef = useRef(null)
 
-  const { getProductByBarcode } = useProductStore()
-  const { addToCart } = useSalesStore()
+  const { getProductByBarcode, searchResults } = useProductStore()
+  const { addToCart, setSelectedProduct, setShowQuantityModal } = useSalesStore()
   const { registerFocusProductSearch } = useKeyboardShortcuts()
+
+  useEffect(() => {
+    if (ref) {
+      if (typeof ref === 'function') {
+        ref(inputRef.current)
+      } else {
+        ref.current = inputRef.current
+      }
+    }
+  }, [ref])
 
   useEffect(() => {
     registerFocusProductSearch(() => {
@@ -28,12 +39,18 @@ const ProductSearch = ({ onSearchChange, searchTerm }) => {
     setLocalSearchTerm(searchTerm)
   }, [searchTerm])
 
+  useEffect(() => {
+    const activeResults = searchResults.filter(p => p.active)
+    setLastSearchResults(activeResults)
+  }, [searchResults])
+
   const handleBarcodeSearch = () => {
     if (isSearchingBarcode) {
       if (localSearchTerm.trim()) {
         const product = getProductByBarcode(localSearchTerm.trim())
         if (product && product.active && product.stock > 0) {
-          addToCart(product, 1)
+          setSelectedProduct(product)
+          setShowQuantityModal(true)
           setLocalSearchTerm("")
           onSearchChange("")
           setIsSearchingBarcode(false)
@@ -82,6 +99,19 @@ const ProductSearch = ({ onSearchChange, searchTerm }) => {
     },
     [onSearchChange],
   )
+
+  useEffect(() => {
+    if (
+      !isSearchingBarcode && 
+      localSearchTerm.trim().length >= 2 && 
+      lastSearchResults.length === 1 &&
+      lastSearchResults[0].stock > 0
+    ) {
+      // Auto-select single result
+      setSelectedProduct(lastSearchResults[0])
+      setShowQuantityModal(true)
+    }
+  }, [lastSearchResults, localSearchTerm, isSearchingBarcode, setSelectedProduct, setShowQuantityModal])
 
   useEffect(() => {
     return () => {
@@ -159,6 +189,8 @@ const ProductSearch = ({ onSearchChange, searchTerm }) => {
       )}
     </div>
   )
-}
+})
+
+ProductSearch.displayName = "ProductSearch"
 
 export default ProductSearch
