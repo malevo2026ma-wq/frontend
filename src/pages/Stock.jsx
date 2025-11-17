@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useProductStore } from "../stores/productStore"
 import { useStockStore } from "../stores/stockStore"
 import { useCategoryStore } from "../stores/categoryStore"
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts"
 import { formatCurrency, formatStock } from "../lib/formatters"
 import Card from "../components/common/Card"
 import Button from "../components/common/Button"
@@ -35,6 +36,7 @@ const Stock = () => {
   } = useProductStore()
   const { fetchStockStats, fetchStockAlerts, stockAlerts } = useStockStore()
   const { categories, fetchCategories } = useCategoryStore()
+  const { registerOpenProductForm, registerFocusNameInput } = useKeyboardShortcuts()
 
   const [activeTab, setActiveTab] = useState("products")
   const [showProductForm, setShowProductForm] = useState(false)
@@ -49,6 +51,8 @@ const Stock = () => {
     page: 1,
     limit: 25,
   })
+
+  const nameInputRef = useRef(null)
 
   // Cargar datos iniciales
   const loadInitialData = useCallback(async () => {
@@ -66,6 +70,19 @@ const Stock = () => {
   useEffect(() => {
     loadInitialData()
   }, [loadInitialData])
+
+  useEffect(() => {
+    registerOpenProductForm(() => {
+      handleOpenProductForm()
+    })
+    registerFocusNameInput(() => {
+      if (nameInputRef.current) {
+        setTimeout(() => {
+          nameInputRef.current?.focus()
+        }, 100)
+      }
+    })
+  }, [registerOpenProductForm, registerFocusNameInput])
 
   // Efecto para cargar productos cuando cambien los filtros
   useEffect(() => {
@@ -503,6 +520,7 @@ const Stock = () => {
         product={selectedProduct}
         onClose={handleCloseProductForm}
         onSave={handleSaveProduct}
+        nameInputRef={nameInputRef}
       />
 
       <StockMovementForm

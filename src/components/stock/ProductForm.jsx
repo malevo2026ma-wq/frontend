@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import { NumericFormat } from "react-number-format"
@@ -26,7 +26,7 @@ import {
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline"
 
-const ProductForm = ({ isOpen, product, onClose, onSave }) => {
+const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
   const { createProduct, updateProduct, loading } = useProductStore()
   const { categories, fetchCategories } = useCategoryStore()
   const { showToast } = useToast()
@@ -490,6 +490,7 @@ const ProductForm = ({ isOpen, product, onClose, onSave }) => {
                                 type="text"
                                 name="name"
                                 id="name"
+                                ref={nameInputRef}
                                 value={formData.name}
                                 onChange={handleChange}
                                 className={`block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
@@ -776,24 +777,25 @@ const ProductForm = ({ isOpen, product, onClose, onSave }) => {
                     type="button"
                     variant="outline"
                     onClick={onClose}
-                    className="py-2.5 px-5 text-sm font-medium rounded-lg"
+                    className="py-2.5 px-5 text-sm"
                   >
                     Cancelar
                   </Button>
-
                   <Button
-                    type="submit"
-                    loading={loading}
+                    type="button"
                     onClick={handleSubmit}
-                    className="py-2.5 px-5 text-sm font-medium bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg shadow-sm"
                     disabled={loading}
+                    className="py-2.5 px-5 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
-                      "Guardando..."
+                      <>
+                        <div className="inline-block animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white mr-2" />
+                        Guardando...
+                      </>
                     ) : (
                       <>
-                        <CheckCircleIcon className="h-4 w-4 mr-1.5 inline" />
-                        {product ? "Actualizar Producto" : "Crear Producto"}
+                        <CheckCircleIcon className="h-4 w-4 mr-2" />
+                        {product ? "Actualizar" : "Crear"}
                       </>
                     )}
                   </Button>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useCashStore } from "@/stores/cashStore"
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts"
 import Button from "@/components/common/Button"
 import CashSummary from "@/components/cash/CashSummary"
 import CashMovementsList from "@/components/cash/CashMovementsList"
@@ -21,6 +22,7 @@ import {
 
 const Cash = () => {
   const { currentCash, fetchCurrentStatus, loading, error } = useCashStore()
+  const { registerOpenCloseForm } = useKeyboardShortcuts()
   const [activeTab, setActiveTab] = useState("summary")
   const [showOpeningForm, setShowOpeningForm] = useState(false)
   const [showCloseForm, setShowCloseForm] = useState(false)
@@ -42,6 +44,14 @@ const Cash = () => {
   useEffect(() => {
     loadInitialStatus()
   }, [loadInitialStatus])
+
+  useEffect(() => {
+    registerOpenCloseForm(() => {
+      if (currentCash.isOpen) {
+        setShowCloseForm(true)
+      }
+    })
+  }, [registerOpenCloseForm, currentCash.isOpen])
 
   // Mostrar loading solo en la carga inicial
   if (loading && !hasInitialized) {

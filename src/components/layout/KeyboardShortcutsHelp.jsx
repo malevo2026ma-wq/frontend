@@ -16,14 +16,19 @@ const KeyboardShortcutsHelp = ({ isOpen, onClose }) => {
       description: "Navega a la página de ventas para procesar transacciones",
     },
     {
+      key: "F5",
+      action: "Historial de Ventas",
+      description: "Accede al historial de ventas en el módulo de reportes",
+    },
+    {
       key: "F6",
       action: "Ver Cierre de Caja",
-      description: "Accede al control de caja para ver estado y realizar cierre",
+      description: "Accede al control de caja y abre el modal de cierre si la caja está abierta",
     },
     {
       key: "F10",
       action: "Carga de Productos",
-      description: "Navega a la gestión de stock para administrar productos",
+      description: "Navega a la gestión de stock y abre el modal para agregar un nuevo producto",
     },
     {
       key: "F12",
