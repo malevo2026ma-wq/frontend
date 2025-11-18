@@ -2,13 +2,16 @@ import { useState, useEffect } from "react"
 import { useConfigStore } from "@/stores/configStore"
 import { useToast } from "@/contexts/ToastContext"
 import Button from "@/components/common/Button"
-import LoadingButton from "@/components/common/LoandingButton"
-import { ReceiptPercentIcon } from "@heroicons/react/24/outline"
+import LoadingButton from "@/components/common/LoadingButton"
+import PrinterTestModal from "./PrinterTestModal"
+import { ReceiptPercentIcon, PrinterIcon } from "@heroicons/react/24/outline"
 
 const TicketConfigTab = () => {
   const { ticketConfig, updateTicketConfig, fetchTicketConfig, loading } = useConfigStore()
   const { showToast } = useToast()
   const [formData, setFormData] = useState(ticketConfig)
+  const [showPrinterModal, setShowPrinterModal] = useState(false)
+  const [selectedPrinter, setSelectedPrinter] = useState(null)
 
   useEffect(() => {
     fetchTicketConfig()
@@ -16,6 +19,11 @@ const TicketConfigTab = () => {
 
   useEffect(() => {
     setFormData(ticketConfig)
+    // Cargar impresora guardada del localStorage
+    const savedPrinter = localStorage.getItem('selectedPrinter')
+    if (savedPrinter) {
+      setSelectedPrinter(JSON.parse(savedPrinter))
+    }
   }, [ticketConfig])
 
   const handleChange = (e) => {
@@ -40,6 +48,12 @@ const TicketConfigTab = () => {
         title: "Error"
       })
     }
+  }
+
+  const handlePrinterSelected = (printer) => {
+    setSelectedPrinter(printer)
+    localStorage.setItem('selectedPrinter', JSON.stringify(printer))
+    showToast(`Impresora seleccionada: ${printer.name}`, 'success')
   }
 
   return (
@@ -88,6 +102,44 @@ const TicketConfigTab = () => {
                 <label htmlFor="auto_print" className="ml-2 block text-sm text-gray-700">
                   Imprimir automáticamente (sin preguntar)
                 </label>
+              </div>
+
+              <div className="border-t pt-4 mt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Impresora Térmica USB
+                  </label>
+                  {selectedPrinter && (
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                      Conectada
+                    </span>
+                  )}
+                </div>
+                
+                {selectedPrinter ? (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                    <p className="text-sm font-medium text-gray-900">{selectedPrinter.name}</p>
+                    <p className="text-xs text-gray-500">Tipo: {selectedPrinter.type}</p>
+                    {selectedPrinter.lastConnection && (
+                      <p className="text-xs text-gray-500">
+                        Última conexión: {new Date(selectedPrinter.lastConnection).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 mb-3">
+                    No hay impresora configurada
+                  </p>
+                )}
+
+                <Button
+                  type="button"
+                  onClick={() => setShowPrinterModal(true)}
+                  className="w-full"
+                >
+                  <PrinterIcon className="h-4 w-4 mr-2" />
+                  {selectedPrinter ? 'Cambiar Impresora' : 'Configurar Impresora'}
+                </Button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -447,6 +499,12 @@ const TicketConfigTab = () => {
           </LoadingButton>
         </div>
       </form>
+
+      <PrinterTestModal
+        isOpen={showPrinterModal}
+        onClose={() => setShowPrinterModal(false)}
+        onPrinterSelected={handlePrinterSelected}
+      />
     </div>
   )
 }
