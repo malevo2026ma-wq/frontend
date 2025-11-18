@@ -501,6 +501,7 @@ const TicketConfigTab = () => {
         </div>
       </form>
 
+
       {/* Added PrinterConfigModal component */}
       {showPrinterConfigModal && (
         <PrinterConfigModal

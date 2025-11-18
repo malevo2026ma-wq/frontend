@@ -8,7 +8,6 @@ import { useConfigStore } from "../../stores/configStore"
 import { formatCurrency, formatDateTime, formatQuantity } from "../../lib/formatters"
 import { useToast } from "../../contexts/ToastContext"
 import ticketPrintService from "../../services/ticketPrintService"
-import escposService from "../../services/escposService"
 import {
   XMarkIcon,
   UserIcon,
@@ -341,14 +340,13 @@ const SaleDetailModal = ({ isOpen, onClose, saleId, onSaleUpdated }) => {
       paymentInfo = getPaymentMethodLabel(sale.payment_method)
     }
 
-    const saleInfo = `
-      Venta #${sale.id}
-      Fecha: ${formatDateTime(sale.created_at)}
-      Cliente: ${sale.customer_name || "Cliente general"}
-      Método de pago: ${paymentInfo}
-      Total: ${formatCurrency(sale.total)}
-      Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
-    `.trim()
+    const saleInfo = `Venta #${sale.id}
+Fecha: ${formatDateTime(sale.created_at)}
+Cliente: ${sale.customer_name || "Cliente general"}
+Método de pago: ${paymentInfo}
+Total: ${formatCurrency(sale.total)}
+Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}`
+      .trim()
 
     navigator.clipboard.writeText(saleInfo).then(() => {
       showToast("Información copiada al portapapeles", "success")
@@ -727,7 +725,7 @@ const SaleDetailModal = ({ isOpen, onClose, saleId, onSaleUpdated }) => {
                 enterFrom="opacity-0 scale-95"
                 enterTo="opacity-100 scale-100"
                 leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
+                leaveFrom="opacity-100"
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all">
