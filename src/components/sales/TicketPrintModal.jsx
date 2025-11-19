@@ -216,27 +216,6 @@ const TicketPrintModal = ({ isOpen, onClose, saleData }) => {
               Imprimir Ticket
             </LoadingButton>
 
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handlePreview}
-                className="py-2 text-sm"
-              >
-                <EyeIcon className="h-4 w-4 mr-1 inline" />
-                Vista Previa
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleDownload}
-                className="py-2 text-sm"
-              >
-                <ArrowDownTrayIcon className="h-4 w-4 mr-1 inline" />
-                Descargar
-              </Button>
-            </div>
-
             <Button
               type="button"
               variant="ghost"

@@ -425,13 +425,6 @@ const SalesHistoryTable = () => {
                     <td className="px-3 py-3 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button
-                          onClick={() => handlePrintSale(sale.id)}
-                          className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
-                          title="Imprimir ticket"
-                        >
-                          <PrinterIcon className="h-4 w-4" />
-                        </button>
-                        <button
                           onClick={() => handleViewSale(sale.id)}
                           className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                           title="Ver detalles"
