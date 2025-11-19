@@ -529,7 +529,7 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div>
                               <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Categoría
+                                Categoría <span className="text-xs text-gray-400">(opcional)</span>
                               </label>
                               <div className="relative">
                                 <select
@@ -548,6 +548,12 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
                                 </select>
                                 <SwatchIcon className="h-4 w-4 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                               </div>
+                              {!formData.category_id && (
+                                <p className="mt-1.5 text-xs text-gray-500 flex items-center">
+                                  <InformationCircleIcon className="h-3.5 w-3.5 mr-1" />
+                                  El producto se creará sin categoría asignada
+                                </p>
+                              )}
                             </div>
 
                             <div>
@@ -733,10 +739,10 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
                               value={formData.image}
                               onChange={handleChange}
                               className={`block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                                errors.image
-                                  ? "border-red-300 bg-red-50"
-                                  : "border-gray-300 hover:border-gray-400 bg-white"
-                              }`}
+                                  errors.image
+                                    ? "border-red-300 bg-red-50"
+                                    : "border-gray-300 hover:border-gray-400 bg-white"
+                                }`}
                               placeholder="https://ejemplo.com/imagen.jpg"
                             />
                             {errors.image && (
