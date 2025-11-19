@@ -181,18 +181,27 @@ const SaleDetailModal = ({ isOpen, onClose, saleId, onSaleUpdated }) => {
       await cancelSale(saleId, cancelReason.trim())
       showToast("Venta cancelada correctamente", "success")
 
+      // Recargar los detalles de la venta para mostrar el estado actualizado
       await loadSaleDetail()
+      
+      // Cerrar el modal de confirmación
       setShowCancelConfirm(false)
       setCancelReason("")
 
+      // Notificar al componente padre para actualizar la lista
       if (onSaleUpdated) {
         onSaleUpdated()
       }
     } catch (error) {
+      // Mostrar el error pero NO romper el componente
       showToast(error.message || "Error al cancelar la venta", "error")
-      // Cerrar el modal de confirmación pero NO recargar los datos
+      
+      // Solo cerrar el modal de confirmación, NO cerrar el modal principal
       setShowCancelConfirm(false)
       setCancelReason("")
+      
+      // NO llamar a loadSaleDetail() ni onSaleUpdated() cuando hay error
+      // Esto evita que se rompa la interfaz de reportes
     } finally {
       setCancelLoading(false)
     }

@@ -554,9 +554,8 @@ export const useSalesStore = create((set, get) => ({
     }
   },
 
-  // Cancelar venta
   cancelSale: async (id, reason) => {
-    set({ loading: true, error: null })
+    // No establecer loading ni error en el estado global
     try {
       const response = await salesService.cancelSale(id, reason)
 
@@ -572,7 +571,6 @@ export const useSalesStore = create((set, get) => ({
               }
               : sale,
           ),
-          loading: false,
         }))
 
         // NUEVO: Actualizar estado de caja después de cancelación
@@ -585,10 +583,7 @@ export const useSalesStore = create((set, get) => ({
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Error al cancelar venta"
-      set({
-        error: errorMessage,
-        loading: false,
-      })
+      // No guardar el error en el estado global, solo lanzarlo
       throw new Error(errorMessage)
     }
   },
