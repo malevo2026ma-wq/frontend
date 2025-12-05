@@ -54,7 +54,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, isMobile }) => {
                 <BuildingStorefrontIcon className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-900">Viejo Lobo</h1>
+                <h1 className="text-lg font-bold text-gray-900">Copelia</h1>
                 <p className="text-xs text-gray-500">Sistema de Ventas</p>
               </div>
             </div>
