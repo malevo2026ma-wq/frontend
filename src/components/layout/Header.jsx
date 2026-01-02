@@ -5,8 +5,6 @@ import { Menu, Transition } from "@headlessui/react"
 import { useNavigate } from "react-router-dom"
 import {
   Bars3Icon,
-  BellIcon,
-  UserCircleIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   KeyIcon,
@@ -90,16 +88,16 @@ const Header = ({ setSidebarOpen }) => {
     if (!currentCash.isOpen) {
       return "Caja Cerrada"
     }
-    return formatCurrency(currentCash.currentAmount)
+    return formatCurrency(currentCash.totalGeneralCaja)
   }
 
   return (
     <>
       <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-neutral-200 bg-white/95 backdrop-blur-sm px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
         {/* Botón menú móvil */}
-        <button 
-          type="button" 
-          className="-m-2.5 p-2.5 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-xl transition-all duration-200 lg:hidden" 
+        <button
+          type="button"
+          className="-m-2.5 p-2.5 text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-xl transition-all duration-200 lg:hidden"
           onClick={() => setSidebarOpen(true)}
         >
           <span className="sr-only">Abrir sidebar</span>
@@ -116,7 +114,9 @@ const Header = ({ setSidebarOpen }) => {
               <button
                 onClick={() => navigate("/caja")}
                 className={`flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${getCashStatusColor()}`}
-                title={currentCash.isOpen ? "Caja abierta - Click para ver detalles" : "Caja cerrada - Click para abrir"}
+                title={
+                  currentCash.isOpen ? "Caja abierta - Click para ver detalles" : "Caja cerrada - Click para abrir"
+                }
               >
                 {currentCash.isOpen ? (
                   <BanknotesIcon className="h-4 w-4 mr-2.5" />
@@ -146,9 +146,7 @@ const Header = ({ setSidebarOpen }) => {
                 <span className="sr-only">Abrir menú de usuario</span>
                 <div className="flex items-center">
                   <div className="h-9 w-9 rounded-full bg-gradient-to-br from-neutral-400 to-neutral-500 flex items-center justify-center shadow-sm">
-                    <span className="text-sm font-bold text-white">
-                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
+                    <span className="text-sm font-bold text-white">{user?.name?.charAt(0)?.toUpperCase() || "U"}</span>
                   </div>
                   <span className="hidden lg:flex lg:items-center lg:ml-3">
                     <span className="text-sm font-semibold text-neutral-800" aria-hidden="true">
@@ -180,11 +178,15 @@ const Header = ({ setSidebarOpen }) => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-neutral-800 truncate">{user?.name || "Usuario"}</p>
-                        <p className="text-xs text-neutral-500 truncate font-medium">{user?.email || "email@ejemplo.com"}</p>
+                        <p className="text-xs text-neutral-500 truncate font-medium">
+                          {user?.email || "email@ejemplo.com"}
+                        </p>
                       </div>
                     </div>
                     <div className="mt-3">
-                      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs ${getRoleBadgeColor(user?.role)}`}>
+                      <span
+                        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs ${getRoleBadgeColor(user?.role)}`}
+                      >
                         {getRoleDisplay(user?.role)}
                       </span>
                     </div>
