@@ -41,12 +41,12 @@ export const cashService = {
   closeCash: async (notes = "", physicalCount = null) => {
     console.log("🔒 Cerrando caja...")
     const data = {
-      notes: notes,
+      closing_notes: notes || "",
     }
 
     // Si se proporciona un conteo físico, incluirlo
     if (physicalCount !== null && physicalCount !== undefined) {
-      data.physical_cash_amount = physicalCount
+      data.closing_amount = physicalCount
       data.compare_with_physical = true
       console.log("💰 Incluyendo conteo físico:", physicalCount)
     }
