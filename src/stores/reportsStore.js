@@ -300,23 +300,15 @@ export const useReportsStore = create((set, get) => ({
   getSalesStats: () => get().salesStats,
   getGrowthData: () => get().growthData,
 
-  // NUEVO: Obtener estadísticas por tipo de unidad
+  // Obtener estadísticas de productos
   getUnitTypeStats: () => {
     const { topProducts, inventoryData } = get()
 
-    const productStats = {
-      kg_products: topProducts.filter((p) => p.unit_type === "kg").length,
-      unit_products: topProducts.filter((p) => p.unit_type === "unidades").length,
-      kg_revenue: topProducts.filter((p) => p.unit_type === "kg").reduce((sum, p) => sum + p.revenue, 0),
-      unit_revenue: topProducts.filter((p) => p.unit_type === "unidades").reduce((sum, p) => sum + p.revenue, 0),
+    return {
+      total_products: topProducts.length,
+      total_inventory: inventoryData.length,
+      total_revenue: topProducts.reduce((sum, p) => sum + p.revenue, 0),
     }
-
-    const inventoryStats = {
-      kg_inventory: inventoryData.filter((i) => i.unit_type === "kg").length,
-      unit_inventory: inventoryData.filter((i) => i.unit_type === "unidades").length,
-    }
-
-    return { ...productStats, ...inventoryStats }
   },
 
   // Exportación de datos
@@ -332,11 +324,9 @@ export const useReportsStore = create((set, get) => ({
         filename = `ventas_${format(new Date(), "yyyy-MM-dd")}`
         break
       case "products":
-        // ACTUALIZADO: Incluir información de unidades en la exportación
         data = topProducts.map((product) => ({
           ...product,
-          unit_type_label: product.unit_type === "kg" ? "Kilogramos" : "Unidades",
-          quantity_formatted: `${product.quantity} ${product.unit_type === "kg" ? "kg" : "unidades"}`,
+          quantity_formatted: `${product.quantity} unidades`,
         }))
         filename = `productos_${format(new Date(), "yyyy-MM-dd")}`
         break

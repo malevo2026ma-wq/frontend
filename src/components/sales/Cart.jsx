@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useSalesStore } from "../../stores/salesStore"
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts"
-import { formatCurrency, formatStock, validateQuantity, getUnitLabel } from "../../lib/formatters"
+import { formatCurrency, formatStock, validateQuantity } from "../../lib/formatters"
 import { PAYMENT_METHODS } from "../../lib/constants"
 import Button from "../common/Button"
 import DiscountModal from "./DiscountModal"
@@ -48,14 +48,7 @@ const Cart = () => {
 
   const handleQuantityChange = (item, delta) => {
     const currentQuantity = item.quantity
-    let newQuantity
-
-    if (item.unit_type === "kg") {
-      newQuantity = Math.max(0.01, currentQuantity + delta * 0.01)
-      newQuantity = Math.round(newQuantity * 100) / 100
-    } else {
-      newQuantity = Math.max(1, currentQuantity + delta)
-    }
+    const newQuantity = Math.max(1, currentQuantity + delta)
 
     if (newQuantity <= item.stock) {
       updateCartItemQuantity(item.id, newQuantity)
@@ -64,22 +57,16 @@ const Cart = () => {
 
   const startEditingQuantity = (item) => {
     setEditingQuantity(item.id)
-    setTempQuantity(item.unit_type === "kg" ? item.quantity.toFixed(2) : item.quantity.toString())
+    setTempQuantity(item.quantity.toString())
   }
 
   const confirmQuantityEdit = (item) => {
-    const newQuantity = Number.parseFloat(tempQuantity)
+    const newQuantity = Number.parseInt(tempQuantity)
 
-    const roundedNewQuantity = item.unit_type === "kg" ? Math.round(newQuantity * 100) / 100 : newQuantity
-
-    if (
-      validateQuantity(roundedNewQuantity, item.unit_type) &&
-      roundedNewQuantity > 0 &&
-      roundedNewQuantity <= item.stock
-    ) {
-      updateCartItemQuantity(item.id, roundedNewQuantity)
+    if (validateQuantity(newQuantity) && newQuantity > 0 && newQuantity <= item.stock) {
+      updateCartItemQuantity(item.id, newQuantity)
     } else {
-      setTempQuantity(item.unit_type === "kg" ? item.quantity.toFixed(2) : item.quantity.toString())
+      setTempQuantity(item.quantity.toString())
     }
 
     setEditingQuantity(null)
@@ -156,7 +143,7 @@ const Cart = () => {
                   <h4 className="text-sm font-medium text-gray-900 truncate">
                     {item.name}
                     <span className="text-xs text-gray-500 ml-1">
-                      ({formatCurrency(item.price)}/{getUnitLabel(item.unit_type)})
+                      ({formatCurrency(item.price)}/u)
                     </span>
                   </h4>
                   {/* Descripción */}
@@ -169,10 +156,7 @@ const Cart = () => {
                       <button
                         onClick={() => handleQuantityChange(item, -1)}
                         className="p-0.5 rounded-md hover:bg-gray-200 text-gray-600"
-                        disabled={
-                          (item.unit_type === "kg" && item.quantity <= 0.01) ||
-                          (item.unit_type === "unidades" && item.quantity <= 1)
-                        }
+                        disabled={item.quantity <= 1}
                       >
                         <MinusIcon className="h-4 w-4" />
                       </button>
@@ -189,8 +173,8 @@ const Cart = () => {
                             if (e.key === "Escape") cancelQuantityEdit()
                           }}
                           className="w-14 text-center text-xs font-medium border border-gray-300 rounded px-1 py-0.5"
-                          step={item.unit_type === "kg" ? "0.01" : "1"}
-                          min={item.unit_type === "kg" ? "0.01" : "1"}
+                          step="1"
+                          min="1"
                           max={item.stock}
                           autoFocus
                         />
@@ -200,7 +184,7 @@ const Cart = () => {
                           className="min-w-[2.5rem] text-center text-xs font-medium hover:bg-gray-200 rounded px-1.5 py-0.5"
                           title="Clic para editar cantidad"
                         >
-                          {formatStock(item.quantity, item.unit_type, false)}
+                          {formatStock(item.quantity, false)}
                         </button>
                       )}
 

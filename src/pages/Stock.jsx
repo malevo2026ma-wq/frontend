@@ -22,7 +22,6 @@ import {
   PencilIcon,
   TrashIcon,
   ArrowsRightLeftIcon,
-  ScaleIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline"
 
@@ -404,20 +403,7 @@ const Stock = () => {
                               )}
                             </div>
                             <div className="ml-4 flex-1 min-w-0">
-                              <div className="flex items-center">
-                                <div className="text-sm font-medium text-gray-900 truncate">{product.name}</div>
-                                {product.unit_type === "kg" ? (
-                                  <ScaleIcon
-                                    className="h-4 w-4 text-blue-500 ml-2 flex-shrink-0"
-                                    title="Por kilogramos"
-                                  />
-                                ) : (
-                                  <CubeIcon
-                                    className="h-4 w-4 text-green-500 ml-2 flex-shrink-0"
-                                    title="Por unidades"
-                                  />
-                                )}
-                              </div>
+                              <div className="text-sm font-medium text-gray-900 truncate">{product.name}</div>
                               {product.description && (
                                 <div className="text-sm text-gray-500 mt-1">
                                   <div className="line-clamp-2 max-w-xs" title={product.description}>
@@ -425,9 +411,21 @@ const Stock = () => {
                                   </div>
                                 </div>
                               )}
-                              {product.barcode && (
-                                <div className="text-xs text-gray-400 mt-1">Código: {product.barcode}</div>
-                              )}
+                              <div className="flex items-center gap-2 mt-1">
+                                {product.barcode && (
+                                  <div className="text-xs text-gray-400">Código: {product.barcode}</div>
+                                )}
+                                {product.color && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                    {product.color}
+                                  </span>
+                                )}
+                                {product.size && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                                    Talle: {product.size}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </td>
@@ -437,10 +435,7 @@ const Stock = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <div>
-                            {formatCurrency(product.price)}
-                            {product.unit_type === "kg" && <div className="text-xs text-gray-500">por kg</div>}
-                          </div>
+                          {formatCurrency(product.price)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
@@ -450,7 +445,7 @@ const Stock = () => {
                                 : "bg-green-100 text-green-800"
                             }`}
                           >
-                            {formatStock(product.stock, product.unit_type)}
+                            {formatStock(product.stock)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

@@ -16,7 +16,6 @@ import {
   CubeIcon,
   UserIcon,
   ArrowsRightLeftIcon,
-  ScaleIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline"
 

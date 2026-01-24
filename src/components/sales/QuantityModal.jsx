@@ -12,8 +12,6 @@ import {
   XMarkIcon,
   PlusIcon,
   CubeIcon,
-  ScaleIcon,
-  CurrencyDollarIcon,
 } from "@heroicons/react/24/outline"
 
 const QuantityModal = () => {
@@ -28,22 +26,16 @@ const QuantityModal = () => {
 
   // Estados para el modal - solo cantidad
   const [quantityInput, setQuantityInput] = useState("")
-  const [amountInput, setAmountInput] = useState("")
-  const [inputMode, setInputMode] = useState("quantity")
   const [calculatedQuantity, setCalculatedQuantity] = useState(0)
   const [calculatedAmount, setCalculatedAmount] = useState(0)
-  const [isKgProduct, setIsKgProduct] = useState(false); // Declare the variable here
+  const [amountInput, setAmountInput] = useState("") // Declare setAmountInput
 
   const quantityInputRef = useRef(null)
-  const amountInputRef = useRef(null)
 
   // Reset cuando se abre el modal
   useEffect(() => {
     if (showQuantityModal && selectedProduct) {
       setQuantityInput("1")
-      setAmountInput("")
-      setInputMode("quantity")
-      setIsKgProduct(selectedProduct.unit_type === "kg"); // Set the variable value here
     }
   }, [showQuantityModal, selectedProduct])
 

@@ -12,7 +12,6 @@ import {
   BuildingLibraryIcon,
   DevicePhoneMobileIcon,
   ArrowPathIcon,
-  ScaleIcon,
   CubeIcon,
   PrinterIcon,
 } from "@heroicons/react/24/outline"

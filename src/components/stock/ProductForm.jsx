@@ -21,7 +21,6 @@ import {
   PlusIcon,
   PencilIcon,
   SwatchIcon,
-  ScaleIcon,
   ArrowRightIcon,
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline"
@@ -41,7 +40,8 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
     category_id: "",
     barcode: "",
     image: "",
-    unit_type: "unidades",
+    color: "",
+    size: "",
     active: true,
   })
 
@@ -57,18 +57,11 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
   // Cargar datos del producto si estamos editando
   useEffect(() => {
     if (product) {
-      const formatStockValue = (value, unitType) => {
+      const formatStockValue = (value) => {
         if (!value) return ""
-        const num = Number.parseFloat(value)
+        const num = Number.parseInt(value)
         if (isNaN(num)) return ""
-
-        // Para unidades, mostrar como entero
-        if (unitType === "unidades") {
-          return Math.floor(num).toString()
-        }
-
-        // Para kg, mantener decimales
-        return num.toString()
+        return Math.floor(num).toString()
       }
 
       setFormData({
@@ -76,13 +69,13 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
         description: product.description || "",
         price: product.price?.toString() || "",
         cost: product.cost?.toString() || "",
-        // Aplicando formateo correcto para stock y min_stock
-        stock: formatStockValue(product.stock, product.unit_type || "unidades"),
-        min_stock: formatStockValue(product.min_stock, product.unit_type || "unidades"),
+        stock: formatStockValue(product.stock),
+        min_stock: formatStockValue(product.min_stock),
         category_id: product.category_id?.toString() || "",
         barcode: product.barcode || "",
         image: product.image || "",
-        unit_type: product.unit_type || "unidades",
+        color: product.color || "",
+        size: product.size || "",
         active: product.active !== undefined ? product.active : true,
       })
     } else {
@@ -97,7 +90,8 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
         category_id: "",
         barcode: "",
         image: "",
-        unit_type: "unidades",
+        color: "",
+        size: "",
         active: true,
       })
     }
@@ -108,27 +102,10 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
     const { name, value, type, checked } = e.target
     const newValue = type === "checkbox" ? checked : value
 
-    // Lógica especial para cambios de unidad de medida
-    if (name === "unit_type") {
-      if (value === "unidades" && formData.unit_type === "kg") {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: newValue,
-          stock: prev.stock ? Math.floor(Number.parseFloat(prev.stock)).toString() : "",
-          min_stock: prev.min_stock ? Math.floor(Number.parseFloat(prev.min_stock)).toString() : "",
-        }))
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: newValue,
-        }))
-      }
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }))
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }))
 
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
@@ -139,13 +116,13 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
     }
   }
 
-  // Manejar cambios en campos numéricos con validación por unidad
+  // Manejar cambios en campos numéricos - solo enteros
   const handleNumericChange = (name, value) => {
     let processedValue = value
 
-    // Para campos de stock, validar según el tipo de unidad
-    if ((name === "stock" || name === "min_stock") && formData.unit_type === "unidades") {
-      const numValue = Number.parseFloat(value)
+    // Para campos de stock, siempre validar como enteros
+    if (name === "stock" || name === "min_stock") {
+      const numValue = Number.parseInt(value)
       if (!isNaN(numValue)) {
         processedValue = Math.floor(numValue).toString()
       }
@@ -198,22 +175,19 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
     // Validar stock solo si no estamos editando o si el stock fue modificado
     if (!product || formData.stock !== (product.stock?.toString() || "")) {
       if (formData.stock === "") {
-        // Permitir vacío si no es requerido explícitamente, pero validamos si se proporciona
+        // Permitir vacío si no es requerido explícitamente
       } else {
-        const stockValue = Number.parseFloat(formData.stock)
-        if (stockValue < 0) {
-          newErrors.stock = "El stock no puede ser negativo"
-        } else if (formData.unit_type === "unidades" && !Number.isInteger(stockValue)) {
-          newErrors.stock = "Para productos por unidades, el stock debe ser un número entero"
+        const stockValue = Number.parseInt(formData.stock)
+        if (isNaN(stockValue) || stockValue < 0) {
+          newErrors.stock = "El stock debe ser un número entero no negativo"
         }
       }
     }
 
-
-    if (!formData.min_stock || Number.parseFloat(formData.min_stock) < 0) {
+    if (!formData.min_stock || Number.parseInt(formData.min_stock) < 0) {
       newErrors.min_stock = "El stock mínimo es requerido y no puede ser negativo"
-    } else if (formData.unit_type === "unidades" && !Number.isInteger(Number.parseFloat(formData.min_stock))) {
-      newErrors.min_stock = "Para productos por unidades, el stock mínimo debe ser un número entero"
+    } else if (!Number.isInteger(Number.parseInt(formData.min_stock))) {
+      newErrors.min_stock = "El stock mínimo debe ser un número entero"
     }
 
     if (formData.image && formData.image.trim() !== "") {
@@ -241,17 +215,18 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
         description: formData.description.trim() || null,
         price: Number.parseFloat(formData.price),
         cost: formData.cost ? Number.parseFloat(formData.cost) : 0,
-        min_stock: formData.min_stock ? Number.parseFloat(formData.min_stock) : 10,
+        min_stock: formData.min_stock ? Number.parseInt(formData.min_stock) : 10,
         category_id: formData.category_id ? Number.parseInt(formData.category_id) : null,
         barcode: formData.barcode.trim() || null,
         image: formData.image.trim() || null,
-        unit_type: formData.unit_type,
+        color: formData.color.trim() || null,
+        size: formData.size.trim() || null,
         active: formData.active,
       }
 
       // Solo agregar stock si no estamos editando
       if (!product) {
-        dataToSend.stock = formData.stock ? Number.parseFloat(formData.stock) : 0
+        dataToSend.stock = formData.stock ? Number.parseInt(formData.stock) : 0
       }
 
       if (product) {
@@ -288,33 +263,19 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
     return 0
   }
 
-  // Obtener configuración de input según tipo de unidad
+  // Obtener configuración de input - siempre enteros
   const getQuantityInputProps = (fieldName) => {
-    const baseProps = {
+    return {
       name: fieldName,
       value: formData[fieldName],
       onChange: (e) => handleNumericChange(fieldName, e.target.value),
+      type: "number",
+      min: "0",
+      step: "1",
+      placeholder: "0",
       className: `block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
         errors[fieldName] ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400 bg-white"
       }`,
-    }
-
-    if (formData.unit_type === "unidades") {
-      return {
-        ...baseProps,
-        type: "number",
-        min: "0",
-        step: "1",
-        placeholder: "0",
-      }
-    } else {
-      return {
-        ...baseProps,
-        type: "number",
-        min: "0",
-        step: "0.001",
-        placeholder: "0.000",
-      }
     }
   }
 
@@ -446,16 +407,33 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
                               <div>
                                 <span className="block text-xs text-gray-500">Stock</span>
                                 <span className="block text-sm font-semibold text-gray-900">
-                                  {formData.stock || "0"} {formData.unit_type === "kg" ? "kg" : "u"}
+                                  {formData.stock || "0"} unidades
                                 </span>
                               </div>
                               <div>
                                 <span className="block text-xs text-gray-500">Mínimo</span>
                                 <span className="block text-sm font-semibold text-gray-900">
-                                  {formData.min_stock || "10"} {formData.unit_type === "kg" ? "kg" : "u"}
+                                  {formData.min_stock || "10"} unidades
                                 </span>
                               </div>
                             </div>
+
+                            {(formData.color || formData.size) && (
+                              <div className="pt-3 border-t border-gray-100">
+                                {formData.color && (
+                                  <div className="mb-2">
+                                    <span className="block text-xs text-gray-500">Color</span>
+                                    <span className="block text-sm font-medium text-gray-900">{formData.color}</span>
+                                  </div>
+                                )}
+                                {formData.size && (
+                                  <div>
+                                    <span className="block text-xs text-gray-500">Talle</span>
+                                    <span className="block text-sm font-medium text-gray-900">{formData.size}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
 
                             {formData.barcode && (
                               <div className="pt-3 border-t border-gray-100">
@@ -667,63 +645,49 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
                             </div>
                           </div>
 
-                          {/* Fila 5: Unidad de Medida */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Unidad de Medida <span className="text-red-500">*</span>
-                            </label>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                              <label
-                                className={`relative cursor-pointer rounded-lg border-2 p-3 transition-all ${
-                                  formData.unit_type === "unidades"
-                                    ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500/20"
-                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                }`}
-                              >
-                                <div className="flex items-center">
-                                  <input
-                                    type="radio"
-                                    name="unit_type"
-                                    value="unidades"
-                                    checked={formData.unit_type === "unidades"}
-                                    onChange={handleChange}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                  />
-                                  <div className="ml-3">
-                                    <div className="flex items-center">
-                                      <CubeIcon className="h-4 w-4 text-gray-600 mr-1.5" />
-                                      <span className="text-sm font-medium text-gray-900">Unidades</span>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-0.5">Productos individuales</p>
-                                  </div>
-                                </div>
+                          {/* Fila 5: Color y Talle */}
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                              <label htmlFor="color" className="block text-sm font-medium text-gray-700 mb-1.5">
+                                Color <span className="text-xs text-gray-400">(opcional)</span>
                               </label>
+                              <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                  <SwatchIcon className="h-5 w-5 text-gray-400" />
+                                </div>
+                                <input
+                                  type="text"
+                                  name="color"
+                                  id="color"
+                                  value={formData.color}
+                                  onChange={handleChange}
+                                  className={`block w-full pl-10 px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                    errors.color
+                                      ? "border-red-300 bg-red-50"
+                                      : "border-gray-300 hover:border-gray-400 bg-white"
+                                  }`}
+                                  placeholder="Ej: Azul, Rojo, Negro"
+                                />
+                              </div>
+                            </div>
 
-                              <label
-                                className={`relative cursor-pointer rounded-lg border-2 p-3 transition-all ${
-                                  formData.unit_type === "kg"
-                                    ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500/20"
-                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                }`}
-                              >
-                                <div className="flex items-center">
-                                  <input
-                                    type="radio"
-                                    name="unit_type"
-                                    value="kg"
-                                    checked={formData.unit_type === "kg"}
-                                    onChange={handleChange}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                  />
-                                  <div className="ml-3">
-                                    <div className="flex items-center">
-                                      <ScaleIcon className="h-4 w-4 text-gray-600 mr-1.5" />
-                                      <span className="text-sm font-medium text-gray-900">Kilogramos</span>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-0.5">Productos por peso</p>
-                                  </div>
-                                </div>
+                            <div>
+                              <label htmlFor="size" className="block text-sm font-medium text-gray-700 mb-1.5">
+                                Talle <span className="text-xs text-gray-400">(opcional)</span>
                               </label>
+                              <input
+                                type="text"
+                                name="size"
+                                id="size"
+                                value={formData.size}
+                                onChange={handleChange}
+                                className={`block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                  errors.size
+                                    ? "border-red-300 bg-red-50"
+                                    : "border-gray-300 hover:border-gray-400 bg-white"
+                                }`}
+                                placeholder="Ej: S, M, L, XL, 42"
+                              />
                             </div>
                           </div>
 
@@ -783,7 +747,7 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
                     type="button"
                     variant="outline"
                     onClick={onClose}
-                    className="py-2.5 px-5 text-sm"
+                    className="py-2.5 px-5 text-sm bg-transparent"
                   >
                     Cancelar
                   </Button>

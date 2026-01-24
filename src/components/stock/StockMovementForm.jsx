@@ -495,13 +495,13 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-gray-500">Stock actual:</span>
                               <span className="text-xs font-medium text-gray-900">
-                                {formatStock(selectedProduct.stock, selectedProduct.unit_type)}
+                                {formatStock(selectedProduct.stock)}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-gray-500">Nuevo stock:</span>
                               <span className="text-xs font-bold text-blue-600">
-                                {formatStock(calculateNewStock(), selectedProduct.unit_type)}
+                                {formatStock(calculateNewStock())}
                               </span>
                             </div>
                           </div>
@@ -557,7 +557,7 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                                 {/* Cantidad */}
                                 <div className="mt-6">
                                   <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Cantidad * ({selectedProduct.unit_type === "kg" ? "kg" : "unidades"})
+                                    Cantidad * (unidades)
                                   </label>
                                   <input {...getQuantityInputProps()} />
                                   {errors.quantity && (
@@ -569,30 +569,15 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                                   <div className="mt-3 p-3 bg-white rounded-lg border border-purple-200">
                                     <div className="text-sm text-gray-600">
                                       <p className="font-medium mb-1">Información del producto:</p>
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <span className="text-gray-500">Stock actual: </span>
-                                          <span className="font-semibold">
-                                            {formatStock(selectedProduct.stock, selectedProduct.unit_type)}
-                                          </span>
-                                        </div>
-                                        <div>
-                                          <span className="text-gray-500">Tipo: </span>
-                                          <span className="font-medium">
-                                            {selectedProduct.unit_type === "kg" ? "Por kilogramos" : "Por unidades"}
-                                          </span>
-                                        </div>
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-gray-500">Stock actual:</span>
+                                        <span className="font-semibold">
+                                          {formatStock(selectedProduct.stock)}
+                                        </span>
                                       </div>
-                                      {selectedProduct.unit_type === "kg" && (
-                                        <p className="text-xs text-blue-600 mt-2">
-                                          💡 Puedes usar decimales (ej: 1.5 kg, 0.250 kg)
-                                        </p>
-                                      )}
-                                      {selectedProduct.unit_type === "unidades" && (
-                                        <p className="text-xs text-blue-600 mt-2">
-                                          💡 Solo números enteros (ej: 1, 5, 10 unidades)
-                                        </p>
-                                      )}
+                                      <p className="text-xs text-blue-600 mt-2">
+                                        💡 Solo números enteros (ej: 1, 5, 10 unidades)
+                                      </p>
                                     </div>
                                   </div>
                                 </div>
@@ -643,7 +628,7 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                                       <div className="text-center p-3 bg-gray-50 rounded-lg">
                                         <p className="text-xs text-gray-500 mb-1">Stock Actual</p>
                                         <p className="text-lg font-bold text-gray-900">
-                                          {formatStock(selectedProduct.stock, selectedProduct.unit_type)}
+                                          {formatStock(selectedProduct.stock)}
                                         </p>
                                       </div>
                                       <div className="text-center p-3 bg-blue-50 rounded-lg">
@@ -662,13 +647,13 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                                             : formData.type === STOCK_MOVEMENTS.SALIDA
                                               ? "-"
                                               : "="}
-                                          {formatQuantity(formData.quantity, selectedProduct.unit_type)}
+                                          {formatQuantity(formData.quantity)}
                                         </p>
                                       </div>
                                       <div className="text-center p-3 bg-green-50 rounded-lg">
                                         <p className="text-xs text-gray-500 mb-1">Nuevo Stock</p>
                                         <p className="text-lg font-bold text-green-600">
-                                          {formatStock(calculateNewStock(), selectedProduct.unit_type)}
+                                          {formatStock(calculateNewStock())}
                                         </p>
                                       </div>
                                     </div>
@@ -694,7 +679,7 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                                             <p className="font-medium">📊 Stock bajo</p>
                                             <p>
                                               El stock quedará por debajo del mínimo recomendado (
-                                              {formatStock(selectedProduct.min_stock, selectedProduct.unit_type)})
+                                              {formatStock(selectedProduct.min_stock)})
                                             </p>
                                           </div>
                                         </div>

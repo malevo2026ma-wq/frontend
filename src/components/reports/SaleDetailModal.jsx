@@ -21,7 +21,6 @@ import {
   ExclamationTriangleIcon,
   PrinterIcon,
   DocumentDuplicateIcon,
-  ScaleIcon,
   CubeIcon,
   EyeIcon,
   PhotoIcon,
@@ -571,28 +570,14 @@ Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
                                           {item.product_barcode && (
                                             <div className="text-xs text-gray-500">Código: {item.product_barcode}</div>
                                           )}
-                                          <div className="flex items-center text-xs text-gray-400 mt-1">
-                                            {item.unit_type === "kg" ? (
-                                              <>
-                                                <ScaleIcon className="h-3 w-3 mr-1 text-blue-600" />
-                                                <span className="text-blue-600">Por kg</span>
-                                              </>
-                                            ) : (
-                                              <>
-                                                <CubeIcon className="h-3 w-3 mr-1 text-green-600" />
-                                                <span className="text-green-600">Por unidades</span>
-                                              </>
-                                            )}
-                                          </div>
                                         </div>
                                       </div>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-900">
-                                      {formatQuantity(item.quantity, item.unit_type || "unidades")}
+                                      {formatQuantity(item.quantity)}
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-900">
                                       {formatCurrency(item.unit_price)}
-                                      {item.unit_type === "kg" && <span className="text-xs text-blue-600 ml-1">/kg</span>}
                                     </td>
                                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                                       {formatCurrency(item.subtotal)}
