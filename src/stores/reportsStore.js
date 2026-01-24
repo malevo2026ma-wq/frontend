@@ -172,11 +172,7 @@ export const useReportsStore = create((set, get) => ({
         amount: Number.parseFloat(cat.amount || 0),
         percentage: Number.parseFloat(cat.percentage || 0),
         products: Number.parseInt(cat.products || 0),
-        // NUEVO: Información de unidades por categoría
-        kg_sold: Number.parseFloat(cat.kg_sold || 0),
         units_sold: Number.parseInt(cat.units_sold || 0),
-        kg_products: Number.parseInt(cat.kg_products || 0),
-        unit_products: Number.parseInt(cat.unit_products || 0),
       }))
 
       // Procesar métodos de pago
@@ -187,16 +183,15 @@ export const useReportsStore = create((set, get) => ({
         transactions: Number.parseInt(pm.transactions || 0),
       }))
 
-      // ACTUALIZADO: Procesar productos top con información de unidades
+      // Procesar productos top - solo enteros
       const processedProducts = products.map((product) => ({
         id: product.id,
         name: product.name,
         image: product.image,
-        quantity: Number.parseFloat(product.quantity || 0), // Cambiar a parseFloat para soportar decimales
+        quantity: Number.parseInt(product.quantity || 0),
         revenue: Number.parseFloat(product.revenue || 0),
         margin: product.margin ? Number.parseFloat(product.margin) : get().calculateMargin(product.price, product.cost),
-        unit_type: product.unit_type || "unidades", // NUEVO: Tipo de unidad
-        sales_count: Number.parseInt(product.sales_count || 0), // NUEVO: Número de ventas
+        sales_count: Number.parseInt(product.sales_count || 0),
         price: Number.parseFloat(product.price || 0),
         cost: Number.parseFloat(product.cost || 0),
       }))
@@ -210,13 +205,12 @@ export const useReportsStore = create((set, get) => ({
         lastPurchase: customer.lastPurchase,
       }))
 
-      // ACTUALIZADO: Procesar inventario con información de unidades
+      // Procesar inventario - solo enteros
       const processedInventory = (inventory.inventory || []).map((item) => ({
         product: item.product,
-        currentStock: Number.parseFloat(item.currentStock || 0), // Cambiar a parseFloat
-        minStock: Number.parseFloat(item.minStock || 0), // Cambiar a parseFloat
+        currentStock: Number.parseInt(item.currentStock || 0),
+        minStock: Number.parseInt(item.minStock || 0),
         status: item.status || get().getStockStatus(item.currentStock, item.minStock),
-        unit_type: item.unit_type || "unidades", // NUEVO: Tipo de unidad
         inventory_value: Number.parseFloat(item.inventory_value || 0),
       }))
 

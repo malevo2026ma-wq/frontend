@@ -71,7 +71,6 @@ export const useStockStore = create((set, get) => ({
         user: movement.user_name || "Sistema",
         product_name: movement.product_name,
         product_image: movement.product_image,
-        product_unit_type: movement.product_unit_type, // Incluir unit_type del producto
       }))
 
       set({
@@ -141,7 +140,6 @@ export const useStockStore = create((set, get) => ({
         threshold: alert.min_stock,
         level: alert.level,
         message: alert.level === "critical" ? "Stock crítico" : "Stock bajo",
-        unitType: alert.unit_type, // AÑADIDO: Incluir unit_type
       }))
 
       set({

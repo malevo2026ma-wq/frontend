@@ -334,13 +334,10 @@ Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
           price: item.unit_price,
           image: item.product_image,
           barcode: item.product_barcode,
-          unit_type: item.unit_type || item.product_unit_type || 'unidades',
           stock: 999999,
         }
         
-        const itemTotal = item.quantity * item.unit_price
-        
-        salesStore.addToCart(productData, item.quantity, itemTotal)
+        salesStore.addToCart(productData, item.quantity)
       })
       
       if (sale.customer_id && sale.customer_name) {
@@ -655,7 +652,7 @@ Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
                       <Button
                         variant="outline"
                         onClick={handleRecreateSale}
-                        className="flex items-center text-blue-600 border-blue-300 hover:bg-blue-50"
+                        className="flex items-center text-blue-600 border-blue-300 hover:bg-blue-50 bg-transparent"
                       >
                         <ArrowPathIcon className="h-4 w-4 mr-2" />
                         Recrear Venta
@@ -672,7 +669,7 @@ Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
                       </Button>
                     )}
                     <div className="flex-1"></div>
-                    <Button variant="outline" onClick={onClose} className="py-3 text-sm font-medium rounded-lg">
+                    <Button variant="outline" onClick={onClose} className="py-3 text-sm font-medium rounded-lg bg-transparent">
                       Cerrar
                     </Button>
                   </div>
@@ -822,7 +819,7 @@ Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
                         <Button
                           variant="outline"
                           onClick={handlePreviewTicket}
-                          className="flex-1 flex items-center justify-center"
+                          className="flex-1 flex items-center justify-center bg-transparent"
                         >
                           <EyeIcon className="h-4 w-4 mr-2" />
                           Vista Previa
@@ -830,7 +827,7 @@ Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
                         <Button
                           variant="outline"
                           onClick={handleDownloadTicket}
-                          className="flex-1 flex items-center justify-center"
+                          className="flex-1 flex items-center justify-center bg-transparent"
                         >
                           <DocumentDuplicateIcon className="h-4 w-4 mr-2" />
                           Descargar

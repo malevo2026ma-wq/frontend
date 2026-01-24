@@ -135,7 +135,6 @@ const StockMovementsList = () => {
     // Usar la información que ya viene del backend con cada movimiento
     return {
       name: movement.product_name || "Producto eliminado",
-      unit_type: movement.product_unit_type || "unidades",
       description: "", // El backend no incluye description en los movimientos por performance
       image: movement.product_image || null,
     }
@@ -246,11 +245,7 @@ const StockMovementsList = () => {
                           </div>
                           <div className="ml-3 flex-1 min-w-0">
                             <div className="flex items-center">
-                              {product.unit_type === "kg" ? (
-                                <ScaleIcon className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />
-                              ) : (
-                                <CubeIcon className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                              )}
+                              <CubeIcon className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
                               <div className="text-sm font-medium text-gray-900 truncate">{product.name}</div>
                             </div>
                             {product.description && (
@@ -284,15 +279,15 @@ const StockMovementsList = () => {
                           {movement.type === STOCK_MOVEMENTS.ENTRADA && "+"}
                           {movement.type === STOCK_MOVEMENTS.SALIDA && "-"}
                           {movement.type === STOCK_MOVEMENTS.AJUSTE && "="}
-                          {formatMovementQuantity(Math.abs(movement.quantity), product.unit_type)}
+                          {formatMovementQuantity(Math.abs(movement.quantity))}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {formatMovementQuantity(movement.previousStock, product.unit_type)}
+                        {formatMovementQuantity(movement.previousStock)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">
-                          {formatMovementQuantity(movement.newStock, product.unit_type)}
+                          {formatMovementQuantity(movement.newStock)}
                         </span>
                       </td>
                       <td className="px-6 py-4">

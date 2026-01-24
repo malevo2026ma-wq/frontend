@@ -136,16 +136,16 @@ export const useSalesStore = create((set, get) => ({
     })
   },
 
-  // ACTUALIZADO: Acciones del carrito con soporte para unidades de medida y total exacto
-  addToCart: (product, quantity, itemTotalPrice) => { // itemTotalPrice is the finalAmount from QuantityModal
+  // Acciones del carrito - solo unidades enteras
+  addToCart: (product, quantity) => {
     set((state) => {
       // Validate quantity against product stock
       if (quantity > product.stock) {
         console.warn(`Stock insuficiente para ${product.name}. Disponible: ${product.stock}, Solicitado: ${quantity}`);
         return state;
       }
-      // Validate quantity format (e.g., for kg products, ensure it's valid decimal)
-      if (!validateQuantity(quantity, product.unit_type)) {
+      // Validate quantity is positive integer
+      if (!validateQuantity(quantity)) {
         console.warn(`Cantidad inválida para producto ${product.name}: ${quantity}`);
         return state;
       }
@@ -153,16 +153,15 @@ export const useSalesStore = create((set, get) => ({
       const existingItemIndex = state.cart.findIndex((item) => item.id === product.id);
 
       let newCart;
+      const totalPrice = quantity * product.price;
       let itemToAddOrUpdate = {
         ...product,
-        quantity: quantity, // This is the final, rounded quantity from QuantityModal
-        totalPrice: itemTotalPrice, // This is the final, rounded total amount for the item from QuantityModal
-        unit_type: product.unit_type || "unidades",
+        quantity: quantity,
+        totalPrice: totalPrice,
       };
 
       if (existingItemIndex !== -1) {
-        // If item exists, replace it with the new calculated quantity and total price from the modal.
-        // This assumes the modal is always used to set the *exact* quantity/amount for an item.
+        // If item exists, replace it with the new calculated quantity and total price
         newCart = state.cart.map((item, index) => (index === existingItemIndex ? itemToAddOrUpdate : item));
       } else {
         // Add new item
@@ -213,7 +212,7 @@ export const useSalesStore = create((set, get) => ({
     })
   },
 
-  // Actualizar cantidad con validación por unidad
+  // Actualizar cantidad - solo enteros
   updateCartItemQuantity: (productId, quantity) => {
     if (quantity <= 0) {
       get().removeFromCart(productId)
@@ -224,13 +223,9 @@ export const useSalesStore = create((set, get) => ({
       const item = state.cart.find((item) => item.id === productId)
       if (!item) return state
 
-      // Validate quantity according to unit type (e.g., integer for units, decimal for kg)
-      // And round quantity for kg products to 2 decimal places
-      let validatedQuantity = quantity;
-      if (item.unit_type === "kg") {
-        validatedQuantity = Math.round(quantity * 100) / 100; // Round to 2 decimal places
-      }
-      if (!validateQuantity(validatedQuantity, item.unit_type)) {
+      // Validate quantity is positive integer
+      const validatedQuantity = Math.floor(quantity);
+      if (!validateQuantity(validatedQuantity)) {
         console.warn(`Cantidad inválida para producto ${item.name}: ${validatedQuantity}`);
         return state;
       }
@@ -246,7 +241,7 @@ export const useSalesStore = create((set, get) => ({
           ? {
               ...cartItem,
               quantity: validatedQuantity,
-              totalPrice: validatedQuantity * cartItem.price, // Recalculate totalPrice based on new quantity and unit price
+              totalPrice: validatedQuantity * cartItem.price,
             }
           : cartItem
       )
@@ -415,8 +410,7 @@ export const useSalesStore = create((set, get) => ({
           product_id: item.id,
           quantity: item.quantity,
           unit_price: item.price,
-          total_price: item.totalPrice, 
-          unit_type: item.unit_type,
+          total_price: item.totalPrice,
         })),
         subtotal: state.cartTotal,
         discount: state.cartDiscount,

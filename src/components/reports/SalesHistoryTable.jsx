@@ -174,7 +174,7 @@ const SalesHistoryTable = () => {
     }
   }
 
-  // NUEVO: Función para renderizar resumen de productos con unidades
+  // Función para renderizar resumen de productos - solo unidades
   const renderProductsSummary = (sale) => {
     if (!sale.items || sale.items.length === 0) {
       return (
@@ -184,39 +184,17 @@ const SalesHistoryTable = () => {
       )
     }
 
-    // Agrupar por tipo de unidad
-    const summary = sale.items.reduce(
-      (acc, item) => {
-        const unitType = item.unit_type || "unidades"
-        if (unitType === "kg") {
-          acc.kg.count += 1
-          acc.kg.quantity += Number.parseFloat(item.quantity) || 0
-        } else {
-          acc.units.count += 1
-          acc.units.quantity += Number.parseFloat(item.quantity) || 0
-        }
-        return acc
-      },
-      {
-        kg: { count: 0, quantity: 0 },
-        units: { count: 0, quantity: 0 },
-      },
-    )
+    // Sumar todas las cantidades
+    const totalQuantity = sale.items.reduce((acc, item) => {
+      return acc + (Number.parseInt(item.quantity) || 0)
+    }, 0)
 
     return (
       <div className="space-y-1">
-        {summary.units.count > 0 && (
-          <div className="flex items-center text-xs text-gray-600">
-            <CubeIcon className="h-3 w-3 mr-1 text-green-600" />
-            <span className="truncate">{formatQuantity(summary.units.quantity, "unidades")}</span>
-          </div>
-        )}
-        {summary.kg.count > 0 && (
-          <div className="flex items-center text-xs text-gray-600">
-            <ScaleIcon className="h-3 w-3 mr-1 text-blue-600" />
-            <span className="truncate">{formatQuantity(summary.kg.quantity, "kg")}</span>
-          </div>
-        )}
+        <div className="flex items-center text-xs text-gray-600">
+          <CubeIcon className="h-3 w-3 mr-1 text-green-600" />
+          <span className="truncate">{formatQuantity(totalQuantity)}</span>
+        </div>
         <div className="text-xs text-gray-400">
           {sale.items.length} producto{sale.items.length !== 1 ? "s" : ""}
         </div>

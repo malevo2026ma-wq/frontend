@@ -376,18 +376,15 @@ class TicketPrintService {
     html += `<div class="separator"></div>`
 
     items.forEach(item => {
-      const quantity = Number.parseFloat(item.quantity)
+      const quantity = Number.parseInt(item.quantity)
       const unitPrice = Number.parseFloat(item.unit_price)
-      const totalPrice = Number.parseFloat(item.quantity) * Number.parseFloat(item.unit_price)
-      
-      // Determinar unidad
-      const unit = item.product_unit_type === 'kg' ? 'kg' : 'un'
+      const totalPrice = Number.parseInt(item.quantity) * Number.parseFloat(item.unit_price)
       
       html += `
         <div class="item-row">
           <div class="item-name">${item.product_name}</div>
           <div class="item-details">
-            <span>${quantity} ${unit} x ${formatCurrency(unitPrice)}</span>
+            <span>${quantity} un x ${formatCurrency(unitPrice)}</span>
             <span>${formatCurrency(totalPrice)}</span>
           </div>
         </div>

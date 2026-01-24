@@ -81,22 +81,16 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
     }))
   }, [])
 
-  // Manejar cambios en cantidad con validación por unidad
+  // Manejar cambios en cantidad - solo enteros
   const handleQuantityChange = useCallback(
     (value) => {
       let processedValue = value
 
-      // Para productos por unidades, solo permitir enteros
-      if (selectedProduct?.unit_type === "unidades" && value) {
-        const numValue = Number.parseFloat(value)
+      // Solo permitir enteros positivos
+      if (value) {
+        const numValue = Number.parseInt(value)
         if (!isNaN(numValue)) {
           processedValue = Math.floor(Math.abs(numValue)).toString()
-        }
-      } else if (value) {
-        // Para kg, permitir decimales pero asegurar que sea positivo
-        const numValue = Number.parseFloat(value)
-        if (!isNaN(numValue)) {
-          processedValue = Math.abs(numValue).toString()
         }
       }
 
@@ -111,7 +105,7 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
         quantity: "",
       }))
     },
-    [selectedProduct],
+    [],
   )
 
   // Validación por sección
@@ -125,23 +119,19 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
             newErrors.type = "Selecciona el tipo de movimiento"
           }
 
-          if (!formData.quantity || Number.parseFloat(formData.quantity) <= 0) {
+          if (!formData.quantity || Number.parseInt(formData.quantity) <= 0) {
             newErrors.quantity = "La cantidad debe ser mayor a 0"
           } else if (selectedProduct) {
-            // Validar según tipo de unidad
-            if (!validateQuantity(formData.quantity, selectedProduct.unit_type)) {
-              if (selectedProduct.unit_type === "unidades") {
-                newErrors.quantity = "Para productos por unidades, ingresa un número entero"
-              } else {
-                newErrors.quantity = "Cantidad inválida"
-              }
+            // Validar que sea entero positivo
+            if (!validateQuantity(formData.quantity)) {
+              newErrors.quantity = "Ingresa un número entero válido"
             }
 
             // Validar stock suficiente para salidas
             if (formData.type === STOCK_MOVEMENTS.SALIDA) {
-              const quantity = Number.parseFloat(formData.quantity)
+              const quantity = Number.parseInt(formData.quantity)
               if (quantity > selectedProduct.stock) {
-                newErrors.quantity = `Stock insuficiente. Disponible: ${formatStock(selectedProduct.stock, selectedProduct.unit_type)}`
+                newErrors.quantity = `Stock insuficiente. Disponible: ${formatStock(selectedProduct.stock)}`
               }
             }
           }
@@ -177,7 +167,7 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
         const movementData = {
           product_id: Number.parseInt(formData.product_id),
           type: formData.type,
-          quantity: Number.parseFloat(formData.quantity),
+          quantity: Number.parseInt(formData.quantity),
           reason: formData.reason.trim(),
         }
 
@@ -238,12 +228,12 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
     [completedSections, activeSection, canNavigateToSection],
   )
 
-  // Calcular nuevo stock
+  // Calcular nuevo stock - solo enteros
   const calculateNewStock = useCallback(() => {
     if (!selectedProduct || !formData.quantity) return selectedProduct?.stock || 0
 
-    const quantity = Number.parseFloat(formData.quantity)
-    const currentStock = Number.parseFloat(selectedProduct.stock)
+    const quantity = Number.parseInt(formData.quantity)
+    const currentStock = Number.parseInt(selectedProduct.stock)
 
     switch (formData.type) {
       case STOCK_MOVEMENTS.ENTRADA:
@@ -296,34 +286,20 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
     }
   }, [])
 
-  // Obtener configuración de input según tipo de unidad
+  // Obtener configuración de input - solo enteros
   const getQuantityInputProps = useCallback(() => {
-    const baseProps = {
+    return {
       value: formData.quantity,
       onChange: (e) => handleQuantityChange(e.target.value),
+      type: "number",
+      min: "0",
+      step: "1",
+      placeholder: "0",
       className: `block w-full px-4 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg font-semibold text-center ${
         errors.quantity ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400 bg-white"
       }`,
     }
-
-    if (selectedProduct?.unit_type === "unidades") {
-      return {
-        ...baseProps,
-        type: "number",
-        min: "0",
-        step: "1",
-        placeholder: "0",
-      }
-    } else {
-      return {
-        ...baseProps,
-        type: "number",
-        min: "0",
-        step: "0.001",
-        placeholder: "0.000",
-      }
-    }
-  }, [formData.quantity, handleQuantityChange, errors.quantity, selectedProduct])
+  }, [formData.quantity, handleQuantityChange, errors.quantity])
 
   // Solo secciones de movimiento y detalles
   const sections = [
@@ -443,7 +419,7 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium text-gray-900 truncate">{selectedProduct.name}</div>
                             <div className="text-xs text-gray-500">
-                              Stock: {formatStock(selectedProduct.stock, selectedProduct.unit_type)}
+                              Stock: {formatStock(selectedProduct.stock)}
                             </div>
                           </div>
                         </div>
@@ -501,7 +477,19 @@ const StockMovementForm = ({ isOpen, selectedProduct, onClose, onSave }) => {
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-gray-500">Cantidad:</span>
                               <span className="text-xs font-bold text-green-600">
-                                {formatQuantity(formData.quantity, selectedProduct.unit_type)}
+                                {formatQuantity(formData.quantity)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-500">Stock actual:</span>
+                              <span className="text-xs font-medium text-gray-900">
+                                {formatStock(selectedProduct.stock)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-500">Stock nuevo:</span>
+                              <span className="text-xs font-bold text-blue-600">
+                                {formatStock(calculateNewStock())}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">

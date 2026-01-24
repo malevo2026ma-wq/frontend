@@ -185,7 +185,7 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
                       title={
                         product.stock === 0
                           ? "Sin stock disponible"
-                          : `Clic para agregar ${product.unit_type === "kg" ? "cantidad personalizada" : "1 unidad"} al carrito`
+                          : "Clic para agregar al carrito"
                       }
                     >
                       <td className="px-3 py-4 min-w-0">
@@ -208,7 +208,7 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
                               {cartQuantity > 0 && (
                                 <div className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0">
                                   <ShoppingCartIcon className="h-3 w-3 mr-1" />
-                                  {formatStock(cartQuantity, product.unit_type, false)}
+                                  {formatStock(cartQuantity, false)}
                                 </div>
                               )}
                             </div>
@@ -240,7 +240,6 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
                       <td className="px-3 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {formatCurrency(product.price)}
-                          {product.unit_type === "kg" && <div className="text-xs text-blue-600 font-medium">por kg</div>}
                         </div>
                         {product.cost && (
                           <div className="text-xs text-gray-500 truncate">Costo: {formatCurrency(product.cost)}</div>
@@ -258,11 +257,11 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
                                   : "text-green-600"
                             }`}
                           >
-                            {formatStock(product.stock, product.unit_type)}
+                            {formatStock(product.stock)}
                           </span>
                           {product.min_stock && (
                             <span className="text-xs text-gray-400">
-                              Mín: {formatStock(product.min_stock, product.unit_type)}
+                              Mín: {formatStock(product.min_stock)}
                             </span>
                           )}
                         </div>
@@ -282,7 +281,7 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
             onClick={handleLoadMore}
             disabled={loading}
             variant="outline"
-            className="px-6 py-3 text-base font-medium shadow-sm hover:shadow-md transition-all"
+            className="px-6 py-3 text-base font-medium shadow-sm hover:shadow-md transition-all bg-transparent"
           >
             {loading ? (
               <>

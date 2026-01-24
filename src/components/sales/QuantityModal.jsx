@@ -10,10 +10,10 @@ import { formatCurrency, formatStock } from "../../lib/formatters"
 import Button from "../common/Button"
 import {
   XMarkIcon,
-  ScaleIcon,
-  CurrencyDollarIcon,
   PlusIcon,
   CubeIcon,
+  ScaleIcon,
+  CurrencyDollarIcon,
 } from "@heroicons/react/24/outline"
 
 const QuantityModal = () => {
@@ -26,93 +26,68 @@ const QuantityModal = () => {
 
   const { showToast } = useToast()
 
-  // Estados para el modal
-  const [inputMode, setInputMode] = useState("amount") // "amount" o "quantity"
-  const [amountInput, setAmountInput] = useState("")
+  // Estados para el modal - solo cantidad
   const [quantityInput, setQuantityInput] = useState("")
+  const [amountInput, setAmountInput] = useState("")
+  const [inputMode, setInputMode] = useState("quantity")
   const [calculatedQuantity, setCalculatedQuantity] = useState(0)
   const [calculatedAmount, setCalculatedAmount] = useState(0)
+  const [isKgProduct, setIsKgProduct] = useState(false); // Declare the variable here
 
-  const amountInputRef = useRef(null)
   const quantityInputRef = useRef(null)
+  const amountInputRef = useRef(null)
 
   // Reset cuando se abre el modal
   useEffect(() => {
     if (showQuantityModal && selectedProduct) {
-      if (selectedProduct.unit_type === "kg") {
-        // Para productos por kg, empezar en modo importe
-        setInputMode("amount")
-        const suggestedAmount = Math.ceil(selectedProduct.price * 0.25 / 100) * 100 // ~250g
-        setAmountInput(suggestedAmount.toString())
-        setQuantityInput("0.25")
-      } else {
-        // Para productos por unidad, solo modo cantidad
-        setInputMode("quantity")
-        setQuantityInput("1")
-        setAmountInput("")
-      }
+      setQuantityInput("1")
+      setAmountInput("")
+      setInputMode("quantity")
+      setIsKgProduct(selectedProduct.unit_type === "kg"); // Set the variable value here
     }
   }, [showQuantityModal, selectedProduct])
 
-  // Enfocar input cuando se abre el modal o cambia el modo
+  // Enfocar input cuando se abre el modal
   useEffect(() => {
-    if (showQuantityModal) {
+    if (showQuantityModal && quantityInputRef.current) {
       setTimeout(() => {
-        if (inputMode === "amount" && amountInputRef.current) {
-          amountInputRef.current.focus()
-          amountInputRef.current.select()
-        } else if (inputMode === "quantity" && quantityInputRef.current) {
-          quantityInputRef.current.focus()
-          quantityInputRef.current.select()
-        }
+        quantityInputRef.current.focus()
+        quantityInputRef.current.select()
       }, 100)
     }
-  }, [inputMode, showQuantityModal])
+  }, [showQuantityModal])
 
-  // Calcular valores cuando cambia el input
+  // Calcular valores cuando cambia el input - solo enteros
   useEffect(() => {
     if (!selectedProduct) return
 
-    if (inputMode === "amount" && amountInput) {
-      const amount = parseFloat(amountInput) || 0
-      if (amount > 0) {
-        const quantity = amount / selectedProduct.price
-        // Round quantity to 2 decimal places for kg products
-        setCalculatedQuantity(selectedProduct.unit_type === "kg" ? Math.round(quantity * 100) / 100 : quantity);
-        setCalculatedAmount(amount)
-      } else {
-        setCalculatedQuantity(0);
-        setCalculatedAmount(0);
-      }
-    } else if (inputMode === "quantity" && quantityInput) {
-      const quantity = parseFloat(quantityInput) || 0
+    if (quantityInput) {
+      const quantity = parseInt(quantityInput) || 0
       if (quantity > 0) {
         const amount = quantity * selectedProduct.price
         setCalculatedAmount(Math.round(amount * 100) / 100)
-        // Round quantity to 2 decimal places for kg products
-        setCalculatedQuantity(selectedProduct.unit_type === "kg" ? Math.round(quantity * 100) / 100 : quantity);
+        setCalculatedQuantity(Math.floor(quantity));
       } else {
         setCalculatedQuantity(0);
         setCalculatedAmount(0);
       }
     }
-  }, [amountInput, quantityInput, inputMode, selectedProduct])
-
-  const handleAmountChange = (values) => {
-    const { floatValue } = values
-    setAmountInput(floatValue?.toString() || "")
-  }
+  }, [quantityInput, selectedProduct])
 
   const handleQuantityChange = (values) => {
     const { floatValue } = values
     setQuantityInput(floatValue?.toString() || "")
   }
 
+  const handleAmountChange = (values) => {
+    const { floatValue } = values
+    setAmountInput(floatValue?.toString() || "")
+  }
+
   const handleConfirm = () => {
     if (!selectedProduct) return
 
     const finalQuantity = calculatedQuantity
-    const finalAmount = calculatedAmount
 
     // Validaciones
     if (finalQuantity <= 0) {
@@ -121,21 +96,14 @@ const QuantityModal = () => {
     }
 
     if (finalQuantity > selectedProduct.stock) {
-      showToast(`Stock insuficiente. Disponible: ${formatStock(selectedProduct.stock, selectedProduct.unit_type)}`, "error")
+      showToast(`Stock insuficiente. Disponible: ${formatStock(selectedProduct.stock)}`, "error")
       return
     }
 
-    if (finalAmount <= 0) {
-      showToast("El importe debe ser mayor a 0", "error")
-      return
-    }
-
-    // Pass the final calculated quantity and amount to addToCart
-    addToCart(selectedProduct, finalQuantity, finalAmount)
+    // Add to cart with quantity only
+    addToCart(selectedProduct, finalQuantity)
     
-    const message = selectedProduct.unit_type === "kg" 
-      ? `Agregado: ${formatStock(finalQuantity, "kg")} de ${selectedProduct.name} por ${formatCurrency(finalAmount)}`
-      : `Agregado: ${finalQuantity} ${selectedProduct.name} por ${formatCurrency(finalAmount)}`
+    const message = `Agregado: ${finalQuantity} ${selectedProduct.name} por ${formatCurrency(calculatedAmount)}`
     
     showToast(message, "success")
 
@@ -158,41 +126,15 @@ const QuantityModal = () => {
     }
   }
 
-  // Valores rápidos
-  const getQuickValues = () => {
-    if (!selectedProduct) return []
-    
-    if (selectedProduct.unit_type === "kg") {
-      if (inputMode === "amount") {
-        return [
-          { label: "$500", value: 500 },
-          { label: "$1000", value: 1000 },
-          { label: "$1500", value: 1500 },
-          { label: "$2000", value: 2000 },
-        ]
-      } else {
-        return [
-          { label: "0.25kg", value: 0.25 },
-          { label: "0.5kg", value: 0.5 },
-          { label: "1kg", value: 1 },
-          { label: "2kg", value: 2 },
-        ]
-      }
-    } else {
-      return [
-        { label: "1", value: 1 },
-        { label: "2", value: 2 },
-        { label: "5", value: 5 },
-        { label: "10", value: 10 },
-      ]
-    }
-  }
-
-  const quickValues = getQuickValues()
+  // Valores rápidos - solo enteros
+  const quickValues = [
+    { label: "1", value: 1 },
+    { label: "2", value: 2 },
+    { label: "5", value: 5 },
+    { label: "10", value: 10 },
+  ]
 
   if (!selectedProduct) return null
-
-  const isKgProduct = selectedProduct.unit_type === "kg"
 
   return (
     <Transition appear show={showQuantityModal} as={Fragment}>
@@ -224,18 +166,12 @@ const QuantityModal = () => {
                 {/* Header compacto */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-100">
                   <div className="flex items-center space-x-2">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      isKgProduct ? "bg-blue-100" : "bg-green-100"
-                    }`}>
-                      {isKgProduct ? (
-                        <ScaleIcon className="h-4 w-4 text-blue-600" />
-                      ) : (
-                        <CubeIcon className="h-4 w-4 text-green-600" />
-                      )}
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-100">
+                      <CubeIcon className="h-4 w-4 text-green-600" />
                     </div>
                     <div className="text-left">
                       <Dialog.Title as="h3" className="text-base font-semibold text-gray-900">
-                        {isKgProduct ? "Cantidad por Peso" : "Cantidad"}
+                        Cantidad
                       </Dialog.Title>
                       <p className="text-xs text-gray-500 truncate max-w-40" title={selectedProduct.name}>
                         {selectedProduct.name}
@@ -256,7 +192,7 @@ const QuantityModal = () => {
                   <div className="bg-gray-50 rounded-lg p-3 text-sm">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">
-                        Precio {isKgProduct ? "por kg" : "unitario"}:
+                        Precio unitario:
                       </span>
                       <span className="font-semibold text-gray-900">
                         {formatCurrency(selectedProduct.price)}
@@ -265,93 +201,37 @@ const QuantityModal = () => {
                     <div className="flex justify-between items-center mt-1">
                       <span className="text-gray-600">Stock:</span>
                       <span className="font-semibold text-gray-900">
-                        {formatStock(selectedProduct.stock, selectedProduct.unit_type)}
+                        {formatStock(selectedProduct.stock)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Toggle de modo solo para productos por kg */}
-                  {isKgProduct && (
-                    <div className="flex bg-gray-100 rounded-lg p-1">
-                      <button
-                        onClick={() => setInputMode("amount")}
-                        className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                          inputMode === "amount"
-                            ? "bg-white text-blue-600 shadow-sm"
-                            : "text-gray-600 hover:text-gray-900"
-                        }`}
-                      >
-                        <CurrencyDollarIcon className="h-4 w-4 mr-1" />
-                        Importe
-                      </button>
-                      <button
-                        onClick={() => setInputMode("quantity")}
-                        className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                          inputMode === "quantity"
-                            ? "bg-white text-blue-600 shadow-sm"
-                            : "text-gray-600 hover:text-gray-900"
-                        }`}
-                      >
-                        <ScaleIcon className="h-4 w-4 mr-1" />
-                        Cantidad
-                      </button>
-                    </div>
-                  )}
-
                   {/* Input principal */}
                   <div className="space-y-3">
-                    {(inputMode === "amount" && isKgProduct) ? (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Importe en pesos:
-                        </label>
-                        <NumericFormat
-                          getInputRef={amountInputRef}
-                          value={amountInput}
-                          onValueChange={handleAmountChange}
-                          onKeyDown={handleKeyDown}
-                          thousandSeparator="."
-                          decimalSeparator=","
-                          prefix="$ "
-                          decimalScale={2}
-                          allowNegative={false}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium text-center"
-                          placeholder="$ 0,00"
-                        />
-                      </div>
-                    ) : (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Cantidad {isKgProduct ? "en kg" : "de unidades"}:
-                        </label>
-                        <NumericFormat
-                          getInputRef={quantityInputRef}
-                          value={quantityInput}
-                          onValueChange={handleQuantityChange}
-                          onKeyDown={handleKeyDown}
-                          thousandSeparator="."
-                          decimalSeparator=","
-                          suffix={isKgProduct ? " kg" : ""}
-                          decimalScale={isKgProduct ? 2 : 0}
-                          allowNegative={false}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium text-center"
-                          placeholder={isKgProduct ? "0,00 kg" : "0"}
-                        />
-                      </div>
-                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Cantidad de unidades:
+                      </label>
+                      <NumericFormat
+                        getInputRef={quantityInputRef}
+                        value={quantityInput}
+                        onValueChange={handleQuantityChange}
+                        onKeyDown={handleKeyDown}
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        decimalScale={0}
+                        allowNegative={false}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium text-center"
+                        placeholder="0"
+                      />
+                    </div>
 
                     {/* Botones rápidos */}
                     <div className="grid grid-cols-4 gap-2">
                       {quickValues.map((item) => (
                         <button
                           key={item.value}
-                          onClick={() => {
-                            if (inputMode === "amount" && isKgProduct) {
-                              setAmountInput(item.value.toString())
-                            } else {
-                              setQuantityInput(item.value.toString())
-                            }
-                          }}
+                          onClick={() => setQuantityInput(item.value.toString())}
                           className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors"
                         >
                           {item.label}
@@ -367,7 +247,7 @@ const QuantityModal = () => {
                         <div className="flex justify-between items-center">
                           <span className="text-blue-600">Cantidad:</span>
                           <span className="font-semibold text-blue-900">
-                            {formatStock(calculatedQuantity, selectedProduct.unit_type)}
+                            {formatStock(calculatedQuantity)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center mt-1">
@@ -395,7 +275,7 @@ const QuantityModal = () => {
                   <Button
                     variant="outline"
                     onClick={handleCancel}
-                    className="flex-1 text-sm py-2"
+                    className="flex-1 text-sm py-2 bg-transparent"
                   >
                     Cancelar
                   </Button>

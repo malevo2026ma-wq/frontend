@@ -96,7 +96,7 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
                   {cartQuantity > 0 && (
                     <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs rounded-full px-2 py-1 font-bold z-10 shadow-sm flex items-center">
                       <ShoppingCartIcon className="h-3 w-3 mr-1" />
-                      {formatStock(cartQuantity, product.unit_type, false)}
+                      {formatStock(cartQuantity, false)}
                     </div>
                   )}
 
@@ -158,9 +158,6 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
                       <div className="flex flex-col">
                         <span className="text-lg font-bold text-primary-600">
                           {formatCurrency(product.price)}
-                          {product.unit_type === "kg" && (
-                            <span className="text-xs text-blue-600 font-normal"> /kg</span>
-                          )}
                         </span>
                         {product.cost && (
                           <span className="text-xs text-gray-400">Costo: {formatCurrency(product.cost)}</span>
@@ -176,11 +173,11 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
                                 : "text-green-600"
                           }`}
                         >
-                          {formatStock(product.stock, product.unit_type)}
+                          {formatStock(product.stock)}
                         </div>
                         {product.min_stock && (
                           <div className="text-xs text-gray-400">
-                            Mín: {formatStock(product.min_stock, product.unit_type)}
+                            Mín: {formatStock(product.min_stock)}
                           </div>
                         )}
                       </div>
@@ -193,7 +190,7 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
                       disabled={product.stock === 0}
                     >
                       <PlusIcon className="h-4 w-4 mr-1" />
-                      {product.stock === 0 ? "Sin Stock" : `Agregar ${product.unit_type === "kg" ? "cantidad" : "1u"}`}
+                      {product.stock === 0 ? "Sin Stock" : "Agregar"}
                     </Button>
                   </div>
                 </div>
@@ -207,7 +204,7 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
                 onClick={handleLoadMore}
                 disabled={loading}
                 variant="outline"
-                className="px-6 py-3 text-base font-medium shadow-sm hover:shadow-md transition-all"
+                className="px-6 py-3 text-base font-medium shadow-sm hover:shadow-md transition-all bg-transparent"
               >
                 {loading ? (
                   <>
