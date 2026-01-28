@@ -178,15 +178,31 @@ const CashSummary = () => {
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center">
                   <CreditCardIcon className="h-8 w-8 text-blue-600 mr-3" />
                   <div>
-                    <p className="text-sm font-medium text-blue-800">Tarjeta</p>
-                    <p className="text-xs text-blue-600">No afecta caja física</p>
+                    <p className="text-sm font-medium text-blue-800">Tarjetas</p>
+                    <p className="text-xs text-blue-600">Crédito y Débito (no afectan caja física)</p>
                   </div>
                 </div>
-                <p className="text-xl font-bold text-blue-900">{formatCurrency(currentCash.ventasTarjeta)}</p>
+                <p className="text-xl font-bold text-blue-900">
+                  {formatCurrency(currentCash.ventasTarjeta)}
+                </p>
+              </div>
+              <div className="mt-2 text-xs text-blue-700 space-y-1">
+                <div className="flex justify-between">
+                  <span>Crédito:</span>
+                  <span className="font-semibold">
+                    {formatCurrency(currentCash.ventasTarjetaCredito)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Débito:</span>
+                  <span className="font-semibold">
+                    {formatCurrency(currentCash.ventasTarjetaDebito)}
+                  </span>
+                </div>
               </div>
             </div>
 

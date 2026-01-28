@@ -22,6 +22,8 @@ export const useCashStore = create(
 
         // Desglose para referencia
         ventasEfectivo: 0,
+        ventasTarjetaCredito: 0,
+        ventasTarjetaDebito: 0,
         ventasTarjeta: 0,
         ventasTransferencia: 0,
         totalVentas: 0,
@@ -101,7 +103,14 @@ export const useCashStore = create(
 
               // Desglose
               ventasEfectivo: Number(sessionData.ventas_efectivo || 0),
-              ventasTarjeta: Number(sessionData.ventas_tarjeta || 0),
+              ventasTarjetaCredito: Number(sessionData.ventas_tarjeta_credito || sessionData.ventas_tarjeta || 0),
+              ventasTarjetaDebito: Number(sessionData.ventas_tarjeta_debito || 0),
+              ventasTarjeta: Number(
+                (sessionData.ventas_tarjeta_credito || 0) +
+                  (sessionData.ventas_tarjeta_debito || 0) ||
+                  sessionData.ventas_tarjeta ||
+                  0,
+              ),
               ventasTransferencia: Number(sessionData.ventas_transferencia || 0),
               totalVentas: Number(sessionData.total_ventas || 0),
               pagosCuentaCorriente: Number(sessionData.pagos_cuenta_corriente || 0),
@@ -326,6 +335,8 @@ export const useCashStore = create(
           // Desglose detallado
           desglose: {
             ventasEfectivo: state.currentCash.ventasEfectivo,
+            ventasTarjetaCredito: state.currentCash.ventasTarjetaCredito,
+            ventasTarjetaDebito: state.currentCash.ventasTarjetaDebito,
             ventasTarjeta: state.currentCash.ventasTarjeta,
             ventasTransferencia: state.currentCash.ventasTransferencia,
             pagosCuentaCorriente: state.currentCash.pagosCuentaCorriente,

@@ -202,7 +202,14 @@ const CashCloseForm = ({ isOpen, onClose }) => {
                             <p className="font-medium text-gray-700">Ingresos:</p>
                             <div className="pl-3 space-y-1 text-gray-600">
                               <p>Ventas efectivo: {formatCurrency(closingSummary.desglose.ventasEfectivo)}</p>
-                              <p>Ventas tarjeta: {formatCurrency(closingSummary.desglose.ventasTarjeta)}</p>
+                              <p>
+                                Ventas tarjeta crédito:{" "}
+                                {formatCurrency(closingSummary.desglose.ventasTarjetaCredito)}
+                              </p>
+                              <p>
+                                Ventas tarjeta débito:{" "}
+                                {formatCurrency(closingSummary.desglose.ventasTarjetaDebito)}
+                              </p>
                               <p>Ventas transferencia: {formatCurrency(closingSummary.desglose.ventasTransferencia)}</p>
                               <p>
                                 Pagos cuenta corriente: {formatCurrency(closingSummary.desglose.pagosCuentaCorriente)}

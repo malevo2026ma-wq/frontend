@@ -98,7 +98,8 @@ const CashMovementsList = () => {
   const getPaymentMethodLabel = (method) => {
     const labels = {
       efectivo: "Efectivo",
-      tarjeta_credito: "Tarjeta",
+      tarjeta_credito: "Tarjeta Crédito",
+      tarjeta_debito: "Tarjeta Débito",
       transferencia: "Transferencia",
       multiple: "Múltiple",
     }
