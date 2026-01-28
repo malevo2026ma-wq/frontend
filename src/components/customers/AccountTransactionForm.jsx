@@ -360,7 +360,10 @@ const AccountTransactionForm = ({ customer, onClose, onSuccess }) => {
                                     name="amount"
                                     value={formData.amount}
                                     onValueChange={(values) => {
-                                      setFormData((prev) => ({ ...prev, amount: values.floatValue || "" }))
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        amount: values.floatValue ? values.floatValue.toString() : "",
+                                      }))
                                       if (errors.amount) setErrors((prev) => ({ ...prev, amount: "" }))
                                     }}
                                     thousandSeparator="."
@@ -369,18 +372,10 @@ const AccountTransactionForm = ({ customer, onClose, onSuccess }) => {
                                     decimalScale={2}
                                     fixedDecimalScale={false}
                                     allowLeadingZeros={false}
-                                    customInput={(props) => (
-                                      <input
-                                        {...props}
-                                        type="text"
-                                        className={`block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                                          errors.amount
-                                            ? "border-red-300 bg-red-50"
-                                            : "border-gray-300 hover:border-gray-400 bg-white"
-                                        }`}
-                                        placeholder="$0"
-                                      />
-                                    )}
+                                    className={`block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                      errors.amount ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400 bg-white"
+                                    }`}
+                                    placeholder="$0"
                                   />
                                   {errors.amount && (
                                     <p className="mt-1.5 text-xs text-red-600 flex items-center">
