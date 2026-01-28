@@ -8,7 +8,6 @@ import { formatCurrency, formatStock } from "../../lib/formatters"
 import Button from "../common/Button"
 import PriceSelectionModal from "./PriceSelectionModal"
 import { PlusIcon, MagnifyingGlassIcon, PhotoIcon, ShoppingCartIcon } from "@heroicons/react/24/outline"
-import { setShowQuantityModal } from "./ProductGrid"; // Declare the variable before using it
 
 const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
   const { searchResults, searchPagination, searchProductsForSales, loadMoreSearchResults, loading } =

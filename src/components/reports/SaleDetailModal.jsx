@@ -736,7 +736,7 @@ Estado: ${sale.status === "completed" ? "Completada" : "Cancelada"}
                       disabled={!cancelReason.trim()}
                       className="flex-1 py-3 text-sm font-medium bg-red-600 hover:bg-red-700 rounded-lg"
                     >
-                      {cancelLoading ? "Cancelando..." : "Confirmar Cancelación"}
+                      {cancelLoading ? "Cancelando..." : "Confirmar Cancelaci��n"}
                     </Button>
                   </div>
                 </Dialog.Panel>
