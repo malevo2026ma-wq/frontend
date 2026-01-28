@@ -197,7 +197,7 @@ const Cart = () => {
                       </button>
 
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(item.id, item.price_type)}
                         className="p-0.5 rounded-md hover:bg-red-100 text-red-600 ml-1"
                       >
                         <TrashIcon className="h-4 w-4" />

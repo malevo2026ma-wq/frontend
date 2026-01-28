@@ -48,8 +48,9 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
   }
 
   const getCartQuantity = (productId) => {
-    const cartItem = cart.find((item) => item.id === productId)
-    return cartItem ? cartItem.quantity : 0
+    // Sumar todas las cantidades del producto (puede estar con ambos tipos de precio)
+    const cartItems = cart.filter((item) => item.id === productId)
+    return cartItems.reduce((sum, item) => sum + item.quantity, 0)
   }
 
   const handleLoadMore = async () => {

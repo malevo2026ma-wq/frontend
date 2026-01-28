@@ -6,6 +6,8 @@ import { useCategoryStore } from "../../stores/categoryStore"
 import { useSalesStore } from "../../stores/salesStore"
 import { formatCurrency, formatStock } from "../../lib/formatters"
 import Button from "../common/Button"
+import PriceSelectionModal from "./PriceSelectionModal"
+import QuantitySelectionModal from "./QuantitySelectionModal" // Import QuantitySelectionModal
 import {
   MagnifyingGlassIcon,
   ChevronUpIcon,
@@ -17,10 +19,12 @@ import {
 const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
   const [sortField, setSortField] = useState("total_sold")
   const [sortDirection, setSortDirection] = useState("desc")
+  const [showPriceModal, setShowPriceModal] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
 
   const { searchResults, searchPagination, searchProductsForSales, loadMoreSearchResults, loading } = useProductStore()
   const { categories } = useCategoryStore()
-  const { setSelectedProduct, setShowQuantityModal, cart } = useSalesStore()
+  const { cart } = useSalesStore()
 
   useEffect(() => {
     let isMounted = true
@@ -84,13 +88,14 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
   const handleAddToCart = (product) => {
     if (product.stock > 0) {
       setSelectedProduct(product)
-      setShowQuantityModal(true)
+      setShowPriceModal(true)
     }
   }
 
   const getCartQuantity = (productId) => {
-    const cartItem = cart.find((item) => item.id === productId)
-    return cartItem ? cartItem.quantity : 0
+    // Sumar todas las cantidades del producto (puede estar con ambos tipos de precio)
+    const cartItems = cart.filter((item) => item.id === productId)
+    return cartItems.reduce((sum, item) => sum + item.quantity, 0)
   }
 
   const handleSort = (field) => {
@@ -120,7 +125,18 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <>
+      <PriceSelectionModal
+        isOpen={showPriceModal}
+        onClose={() => setShowPriceModal(false)}
+        product={selectedProduct}
+      />
+      <QuantitySelectionModal
+        isOpen={showQuantityModal}
+        onClose={() => setShowQuantityModal(false)}
+        product={selectedProduct}
+      />
+      <div className="space-y-4">
       {searchTerm && searchTerm.trim().length >= 2 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div className="flex items-center justify-between">
@@ -238,12 +254,17 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
                       </td>
 
                       <td className="px-3 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatCurrency(product.price)}
+                        <div className="flex flex-col">
+                          <div className="text-sm font-semibold text-green-600">
+                            {formatCurrency(product.price_cash)} <span className="text-xs font-normal">contado</span>
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {formatCurrency(product.price_list)} <span className="text-gray-500">lista</span>
+                          </div>
+                          {product.cost && (
+                            <div className="text-xs text-gray-400 truncate">Costo: {formatCurrency(product.cost)}</div>
+                          )}
                         </div>
-                        {product.cost && (
-                          <div className="text-xs text-gray-500 truncate">Costo: {formatCurrency(product.cost)}</div>
-                        )}
                       </td>
 
                       <td className="px-3 py-4 whitespace-nowrap">
@@ -319,7 +340,8 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
           Mostrando {displayProducts.length} de {searchPagination.total} productos para "{searchTerm}"
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
 
