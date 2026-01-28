@@ -4,14 +4,17 @@ import { Fragment } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { XMarkIcon, CreditCardIcon, BanknotesIcon, TagIcon } from "@heroicons/react/24/outline"
 import { formatCurrency } from "../../lib/formatters"
-import { Button } from "../ui/button"
+import { useSalesStore } from "../../stores/salesStore"
+import Button from "../common/Button"
 
-export default function PriceSelectionModal({ isOpen, onClose, product, onSelectPrice }) {
+export default function PriceSelectionModal({ isOpen, onClose, product }) {
+  const { addToCart } = useSalesStore()
+  
   if (!product) return null
 
   const handleSelectPrice = (priceType) => {
-    const selectedPrice = priceType === "list" ? product.price_list : product.price_cash
-    onSelectPrice(product, priceType, selectedPrice)
+    // Agregar al carrito con cantidad 1 y el tipo de precio seleccionado
+    addToCart(product, 1, priceType)
     onClose()
   }
 
@@ -144,9 +147,9 @@ export default function PriceSelectionModal({ isOpen, onClose, product, onSelect
                 {/* Footer */}
                 <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={onClose}
-                    className="w-full"
+                    className="w-full bg-transparent"
                   >
                     Cancelar
                   </Button>
