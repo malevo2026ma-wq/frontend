@@ -250,7 +250,8 @@ export const useSalesStore = create((set, get) => ({
           ? {
               ...cartItem,
               quantity: validatedQuantity,
-              totalPrice: validatedQuantity * cartItem.price,
+              // Usar siempre el precio unitario ya calculado según price_type
+              totalPrice: validatedQuantity * cartItem.unit_price,
             }
           : cartItem
       )
