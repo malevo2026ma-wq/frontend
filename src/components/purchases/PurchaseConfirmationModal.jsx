@@ -9,6 +9,7 @@ import {
   BanknotesIcon,
   BuildingLibraryIcon,
   DocumentTextIcon,
+  CreditCardIcon,
 } from "@heroicons/react/24/outline"
 import { usePurchaseStore } from "../../stores/purchaseStore"
 import { formatCurrency } from "../../lib/formatters"
@@ -21,6 +22,11 @@ const paymentMethodsConfig = {
     label: "Efectivo",
     icon: BanknotesIcon,
     description: "Pago en efectivo",
+  },
+  [PAYMENT_METHODS.TARJETA_DEBITO]: {
+    label: "Tarjeta de Débito",
+    icon: CreditCardIcon,
+    description: "Pago con tarjeta de débito",
   },
   [PAYMENT_METHODS.TRANSFERENCIA]: {
     label: "Transferencia",

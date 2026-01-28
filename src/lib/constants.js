@@ -25,6 +25,7 @@ export const STOCK_MOVEMENT_LABELS = {
 // Métodos de pago
 export const PAYMENT_METHODS = {
   EFECTIVO: "efectivo",
+  TARJETA_DEBITO: "tarjeta_debito",
   TARJETA_CREDITO: "tarjeta_credito",
   TRANSFERENCIA: "transferencia",
   CUENTA_CORRIENTE: "cuenta_corriente",
@@ -32,6 +33,7 @@ export const PAYMENT_METHODS = {
 
 export const PAYMENT_METHOD_LABELS = {
   [PAYMENT_METHODS.EFECTIVO]: "Efectivo",
+  [PAYMENT_METHODS.TARJETA_DEBITO]: "Tarjeta de Débito",
   [PAYMENT_METHODS.TARJETA_CREDITO]: "Tarjeta de Crédito",
   [PAYMENT_METHODS.TRANSFERENCIA]: "Transferencia",
   [PAYMENT_METHODS.CUENTA_CORRIENTE]: "Cuenta Corriente",

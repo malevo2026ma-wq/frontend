@@ -262,9 +262,11 @@ const Cart = () => {
                     ? "💳 Cuenta Corriente"
                     : paymentMethod === PAYMENT_METHODS.TARJETA_CREDITO
                       ? "💳 Tarjeta Crédito"
-                      : paymentMethod === PAYMENT_METHODS.TRANSFERENCIA
-                        ? "🏦 Transferencia"
-                        : "💵 Efectivo"}
+                      : paymentMethod === PAYMENT_METHODS.TARJETA_DEBITO
+                        ? "💳 Tarjeta Débito"
+                        : paymentMethod === PAYMENT_METHODS.TRANSFERENCIA
+                          ? "🏦 Transferencia"
+                          : "💵 Efectivo"}
                 </span>
                 {customer && <span>• {customer.name}</span>}
               </div>

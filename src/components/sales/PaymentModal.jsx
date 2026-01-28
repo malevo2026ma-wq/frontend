@@ -92,6 +92,14 @@ const PaymentModal = () => {
       hoverColor: "hover:bg-green-100 hover:border-green-300",
     },
     {
+      id: PAYMENT_METHODS.TARJETA_DEBITO,
+      name: "Débito",
+      icon: CreditCardIcon,
+      color: "bg-teal-50 border-teal-200 text-teal-800",
+      activeColor: "bg-teal-500 text-white border-teal-500",
+      hoverColor: "hover:bg-teal-100 hover:border-teal-300",
+    },
+    {
       id: PAYMENT_METHODS.TARJETA_CREDITO,
       name: "Crédito",
       icon: CreditCardIcon,
@@ -254,7 +262,10 @@ const PaymentModal = () => {
           return
         }
 
-        if (paymentMethod === PAYMENT_METHODS.TARJETA_CREDITO && !paymentData.cardNumber) {
+        if (
+          (paymentMethod === PAYMENT_METHODS.TARJETA_CREDITO || paymentMethod === PAYMENT_METHODS.TARJETA_DEBITO) &&
+          !paymentData.cardNumber
+        ) {
           showToast("Ingrese los últimos 4 dígitos de la tarjeta", "error")
           return
         }
@@ -289,9 +300,11 @@ const PaymentModal = () => {
             return
           }
 
-          if (pm.method === PAYMENT_METHODS.TARJETA_CREDITO && !pm.data?.cardNumber) {
-            showToast(`Ingrese los datos de la tarjeta para el método ${i + 1}`, "error")
-            return
+          if (pm.method === PAYMENT_METHODS.TARJETA_CREDITO) {
+            if (!pm.data?.cardNumber) {
+              showToast(`Ingrese los datos de la tarjeta para el método ${i + 1}`, "error")
+              return
+            }
           }
 
           if (pm.method === PAYMENT_METHODS.TRANSFERENCIA && !pm.data?.reference) {
@@ -871,8 +884,9 @@ const PaymentModal = () => {
                             </div>
                           )}
 
-                          {/* Campos para tarjeta de crédito */}
-                          {paymentMethod === PAYMENT_METHODS.TARJETA_CREDITO && (
+                          {/* Campos para tarjeta de crédito / débito */}
+                          {(paymentMethod === PAYMENT_METHODS.TARJETA_CREDITO ||
+                            paymentMethod === PAYMENT_METHODS.TARJETA_DEBITO) && (
                             <div className="bg-purple-50 border-purple-200 rounded-xl p-4 border space-y-4">
                               <div>
                                 <label className="block text-sm font-medium text-purple-800 mb-2">
