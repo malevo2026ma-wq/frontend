@@ -1,18 +1,23 @@
 "use client"
 
-import { useMemo, useEffect } from "react"
+import { useMemo, useEffect, useState } from "react"
 import { useProductStore } from "../../stores/productStore"
 import { useCategoryStore } from "../../stores/categoryStore"
 import { useSalesStore } from "../../stores/salesStore"
 import { formatCurrency, formatStock } from "../../lib/formatters"
 import Button from "../common/Button"
+import PriceSelectionModal from "./PriceSelectionModal"
 import { PlusIcon, MagnifyingGlassIcon, PhotoIcon, ShoppingCartIcon } from "@heroicons/react/24/outline"
+import { setShowQuantityModal } from "./ProductGrid"; // Declare the variable before using it
 
 const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
   const { searchResults, searchPagination, searchProductsForSales, loadMoreSearchResults, loading } =
     useProductStore()
   const { categories } = useCategoryStore()
-  const { setSelectedProduct, setShowQuantityModal, cart } = useSalesStore()
+  const { cart } = useSalesStore()
+  
+  const [showPriceModal, setShowPriceModal] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
 
   useEffect(() => {
     let isMounted = true
@@ -39,7 +44,7 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
   const handleAddToCart = (product) => {
     if (product.stock > 0) {
       setSelectedProduct(product)
-      setShowQuantityModal(true)
+      setShowPriceModal(true)
     }
   }
 
@@ -53,7 +58,13 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <>
+      <PriceSelectionModal
+        isOpen={showPriceModal}
+        onClose={() => setShowPriceModal(false)}
+        product={selectedProduct}
+      />
+      <div className="space-y-4">
       {searchTerm && searchTerm.trim().length >= 2 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div className="flex items-center justify-between">
@@ -156,11 +167,20 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
 
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex flex-col">
-                        <span className="text-lg font-bold text-primary-600">
-                          {formatCurrency(product.price)}
-                        </span>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-lg font-bold text-green-600">
+                            {formatCurrency(product.price_cash)}
+                          </span>
+                          <span className="text-xs text-green-600 font-medium">Contado</span>
+                        </div>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="text-sm font-semibold text-gray-600">
+                            {formatCurrency(product.price_list)}
+                          </span>
+                          <span className="text-xs text-gray-500">Lista</span>
+                        </div>
                         {product.cost && (
-                          <span className="text-xs text-gray-400">Costo: {formatCurrency(product.cost)}</span>
+                          <span className="text-xs text-gray-400 mt-1">Costo: {formatCurrency(product.cost)}</span>
                         )}
                       </div>
                       <div className="text-right">
@@ -247,7 +267,8 @@ const ProductGrid = ({ searchTerm, selectedIndex = -1 }) => {
           )}
         </>
       )}
-    </div>
+      </div>
+    </>
   )
 }
 

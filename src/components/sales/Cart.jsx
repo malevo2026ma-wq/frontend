@@ -51,7 +51,7 @@ const Cart = () => {
     const newQuantity = Math.max(1, currentQuantity + delta)
 
     if (newQuantity <= item.stock) {
-      updateCartItemQuantity(item.id, newQuantity)
+      updateCartItemQuantity(item.id, item.price_type, newQuantity)
     }
   }
 
@@ -64,7 +64,7 @@ const Cart = () => {
     const newQuantity = Number.parseInt(tempQuantity)
 
     if (validateQuantity(newQuantity) && newQuantity > 0 && newQuantity <= item.stock) {
-      updateCartItemQuantity(item.id, newQuantity)
+      updateCartItemQuantity(item.id, item.price_type, newQuantity)
     } else {
       setTempQuantity(item.quantity.toString())
     }
@@ -139,11 +139,11 @@ const Cart = () => {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  {/* Nombre y precio unitario */}
+                  {/* Nombre y precio unitario con tipo */}
                   <h4 className="text-sm font-medium text-gray-900 truncate">
                     {item.name}
-                    <span className="text-xs text-gray-500 ml-1">
-                      ({formatCurrency(item.price)}/u)
+                    <span className={`text-xs ml-1 ${item.price_type === 'cash' ? 'text-green-600' : 'text-blue-600'}`}>
+                      ({formatCurrency(item.unit_price)}/{item.price_type === 'cash' ? 'contado' : 'lista'})
                     </span>
                   </h4>
                   {/* Descripción */}

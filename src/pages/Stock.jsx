@@ -434,8 +434,15 @@ const Stock = () => {
                             {getCategoryName(product.category_id)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatCurrency(product.price)}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm">
+                            <div className="font-semibold text-green-600">
+                              {formatCurrency(product.price_cash)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Lista: {formatCurrency(product.price_list)}
+                            </div>
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span

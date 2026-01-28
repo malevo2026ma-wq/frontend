@@ -136,8 +136,8 @@ export const useSalesStore = create((set, get) => ({
     })
   },
 
-  // Acciones del carrito - solo unidades enteras
-  addToCart: (product, quantity) => {
+  // Acciones del carrito - con selección de tipo de precio
+  addToCart: (product, quantity, priceType = 'cash') => {
     set((state) => {
       // Validate quantity against product stock
       if (quantity > product.stock) {
@@ -150,18 +150,25 @@ export const useSalesStore = create((set, get) => ({
         return state;
       }
 
-      const existingItemIndex = state.cart.findIndex((item) => item.id === product.id);
+      // Determinar el precio a usar según el tipo seleccionado
+      const selectedPrice = priceType === 'list' ? product.price_list : product.price_cash;
+      
+      const existingItemIndex = state.cart.findIndex(
+        (item) => item.id === product.id && item.price_type === priceType
+      );
 
       let newCart;
-      const totalPrice = quantity * product.price;
+      const totalPrice = quantity * selectedPrice;
       let itemToAddOrUpdate = {
         ...product,
         quantity: quantity,
+        unit_price: selectedPrice,
         totalPrice: totalPrice,
+        price_type: priceType, // 'cash' o 'list'
       };
 
       if (existingItemIndex !== -1) {
-        // If item exists, replace it with the new calculated quantity and total price
+        // If item exists with same price type, replace it
         newCart = state.cart.map((item, index) => (index === existingItemIndex ? itemToAddOrUpdate : item));
       } else {
         // Add new item
@@ -189,9 +196,11 @@ export const useSalesStore = create((set, get) => ({
     });
   },
 
-  removeFromCart: (productId) => {
+  removeFromCart: (productId, priceType = null) => {
     set((state) => {
-      const newCart = state.cart.filter((item) => item.id !== productId)
+      const newCart = priceType 
+        ? state.cart.filter((item) => !(item.id === productId && item.price_type === priceType))
+        : state.cart.filter((item) => item.id !== productId)
       const cartTotal = newCart.reduce((sum, item) => sum + item.totalPrice, 0) // Use item.totalPrice
 
       // Actualizar montos en modo múltiple
@@ -212,15 +221,15 @@ export const useSalesStore = create((set, get) => ({
     })
   },
 
-  // Actualizar cantidad - solo enteros
-  updateCartItemQuantity: (productId, quantity) => {
+  // Actualizar cantidad - solo enteros, considerando price_type
+  updateCartItemQuantity: (productId, priceType, quantity) => {
     if (quantity <= 0) {
-      get().removeFromCart(productId)
+      get().removeFromCart(productId, priceType)
       return
     }
 
     set((state) => {
-      const item = state.cart.find((item) => item.id === productId)
+      const item = state.cart.find((item) => item.id === productId && item.price_type === priceType)
       if (!item) return state
 
       // Validate quantity is positive integer
@@ -404,13 +413,14 @@ export const useSalesStore = create((set, get) => ({
         }
       }
 
-      // Preparar datos de la venta
+      // Preparar datos de la venta con price_type
       const saleData = {
         items: state.cart.map((item) => ({
           product_id: item.id,
           quantity: item.quantity,
-          unit_price: item.price,
+          unit_price: item.unit_price,
           total_price: item.totalPrice,
+          price_type: item.price_type || 'cash', // Incluir tipo de precio usado
         })),
         subtotal: state.cartTotal,
         discount: state.cartDiscount,

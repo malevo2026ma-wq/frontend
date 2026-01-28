@@ -33,7 +33,8 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    price: "",
+    price_list: "",
+    price_cash: "",
     cost: "",
     stock: "",
     min_stock: "10",
@@ -67,7 +68,8 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
       setFormData({
         name: product.name || "",
         description: product.description || "",
-        price: product.price?.toString() || "",
+        price_list: product.price_list?.toString() || "",
+        price_cash: product.price_cash?.toString() || "",
         cost: product.cost?.toString() || "",
         stock: formatStockValue(product.stock),
         min_stock: formatStockValue(product.min_stock),
@@ -83,7 +85,8 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
       setFormData({
         name: "",
         description: "",
-        price: "",
+        price_list: "",
+        price_cash: "",
         cost: "",
         stock: "",
         min_stock: "10",
@@ -164,8 +167,12 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
       newErrors.name = "El nombre es requerido"
     }
 
-    if (!formData.price || Number.parseFloat(formData.price) <= 0) {
-      newErrors.price = "El precio debe ser mayor a 0"
+    if (!formData.price_list || Number.parseFloat(formData.price_list) <= 0) {
+      newErrors.price_list = "El precio de lista debe ser mayor a 0"
+    }
+
+    if (!formData.price_cash || Number.parseFloat(formData.price_cash) <= 0) {
+      newErrors.price_cash = "El precio de contado debe ser mayor a 0"
     }
     
     if (formData.cost && Number.parseFloat(formData.cost) < 0) {
@@ -213,7 +220,8 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
       const dataToSend = {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
-        price: Number.parseFloat(formData.price),
+        price_list: Number.parseFloat(formData.price_list),
+        price_cash: Number.parseFloat(formData.price_cash),
         cost: formData.cost ? Number.parseFloat(formData.cost) : 0,
         min_stock: formData.min_stock ? Number.parseInt(formData.min_stock) : 10,
         category_id: formData.category_id ? Number.parseInt(formData.category_id) : null,
@@ -253,12 +261,12 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
     return currentStock <= minStock && currentStock > 0
   }
 
-  // Calcular margen de ganancia
+  // Calcular margen de ganancia (basado en precio de lista)
   const calculateMargin = () => {
-    const price = Number.parseFloat(formData.price) || 0
+    const priceList = Number.parseFloat(formData.price_list) || 0
     const cost = Number.parseFloat(formData.cost) || 0
-    if (price > 0 && cost > 0) {
-      return (((price - cost) / price) * 100).toFixed(1)
+    if (priceList > 0 && cost > 0) {
+      return (((priceList - cost) / priceList) * 100).toFixed(1)
     }
     return 0
   }
@@ -551,31 +559,59 @@ const ProductForm = ({ isOpen, product, onClose, onSave, nameInputRef }) => {
                           </div>
 
                           {/* Fila 3: Precios */}
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                             <div>
-                              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Precio de Venta <span className="text-red-500">*</span>
+                              <label htmlFor="price_list" className="block text-sm font-medium text-gray-700 mb-1.5">
+                                Precio de Lista <span className="text-red-500">*</span>
                               </label>
                               <NumericFormat
-                                name="price"
-                                value={formData.price}
-                                onValueChange={(values) => handlePriceChange("price", values)}
+                                name="price_list"
+                                value={formData.price_list}
+                                onValueChange={(values) => handlePriceChange("price_list", values)}
                                 thousandSeparator="."
                                 decimalSeparator=","
                                 prefix="$ "
                                 decimalScale={2}
                                 allowNegative={false}
                                 className={`block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                                  errors.price
+                                  errors.price_list
                                     ? "border-red-300 bg-red-50"
                                     : "border-gray-300 hover:border-gray-400 bg-white"
                                 }`}
                                 placeholder="$ 0,00"
                               />
-                              {errors.price && (
+                              {errors.price_list && (
                                 <p className="mt-1.5 text-xs text-red-600 flex items-center">
                                   <ExclamationTriangleIcon className="h-3.5 w-3.5 mr-1" />
-                                  {errors.price}
+                                  {errors.price_list}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <label htmlFor="price_cash" className="block text-sm font-medium text-gray-700 mb-1.5">
+                                Precio de Contado <span className="text-red-500">*</span>
+                              </label>
+                              <NumericFormat
+                                name="price_cash"
+                                value={formData.price_cash}
+                                onValueChange={(values) => handlePriceChange("price_cash", values)}
+                                thousandSeparator="."
+                                decimalSeparator=","
+                                prefix="$ "
+                                decimalScale={2}
+                                allowNegative={false}
+                                className={`block w-full px-4 py-2.5 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                                  errors.price_cash
+                                    ? "border-red-300 bg-red-50"
+                                    : "border-gray-300 hover:border-gray-400 bg-white"
+                                }`}
+                                placeholder="$ 0,00"
+                              />
+                              {errors.price_cash && (
+                                <p className="mt-1.5 text-xs text-red-600 flex items-center">
+                                  <ExclamationTriangleIcon className="h-3.5 w-3.5 mr-1" />
+                                  {errors.price_cash}
                                 </p>
                               )}
                             </div>
