@@ -7,7 +7,6 @@ import { useSalesStore } from "../../stores/salesStore"
 import { formatCurrency, formatStock } from "../../lib/formatters"
 import Button from "../common/Button"
 import PriceSelectionModal from "./PriceSelectionModal"
-import QuantitySelectionModal from "./QuantityModal" // Import QuantitySelectionModal
 import {
   MagnifyingGlassIcon,
   ChevronUpIcon,
@@ -129,11 +128,6 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
       <PriceSelectionModal
         isOpen={showPriceModal}
         onClose={() => setShowPriceModal(false)}
-        product={selectedProduct}
-      />
-      <QuantitySelectionModal
-        isOpen={showQuantityModal}
-        onClose={() => setShowQuantityModal(false)}
         product={selectedProduct}
       />
       <div className="space-y-4">

@@ -2,33 +2,14 @@
 
 import { Fragment } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import { XMarkIcon, CreditCardIcon, BanknotesIcon, TagIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline"
+import { XMarkIcon, CreditCardIcon, BanknotesIcon, TagIcon } from "@heroicons/react/24/outline"
 import { formatCurrency } from "../../lib/formatters"
 import { useSalesStore } from "../../stores/salesStore"
 import Button from "../common/Button"
 
 export default function PriceSelectionModal({ isOpen, onClose, product }) {
   const { addToCart } = useSalesStore()
-  const selectedPriceType = null; // Declare the variable here
-  const [quantity, setQuantity] = React.useState(1); // Declare quantity state
-
-  const decrementQuantity = () => {
-    setQuantity(prevQuantity => prevQuantity - 1);
-  };
-
-  const incrementQuantity = () => {
-    setQuantity(prevQuantity => prevQuantity + 1);
-  };
-
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
-  };
-
-  const handleAddToCart = () => {
-    addToCart(product, quantity, selectedPriceType);
-    onClose();
-  };
-
+  
   if (!product) return null
 
   const handleSelectPrice = (priceType) => {
@@ -112,11 +93,7 @@ export default function PriceSelectionModal({ isOpen, onClose, product }) {
                   {/* Precio de Lista */}
                   <button
                     onClick={() => handleSelectPrice("list")}
-                    className={`group w-full rounded-xl border-2 p-5 text-left transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] ${
-                      selectedPriceType === "list"
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 bg-white hover:border-blue-500"
-                    }`}
+                    className="group w-full rounded-xl border-2 border-gray-200 bg-white p-5 text-left transition-all hover:border-blue-500 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -139,11 +116,7 @@ export default function PriceSelectionModal({ isOpen, onClose, product }) {
                   {/* Precio de Contado */}
                   <button
                     onClick={() => handleSelectPrice("cash")}
-                    className={`group w-full rounded-xl border-2 p-5 text-left transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] ${
-                      selectedPriceType === "cash"
-                        ? "border-green-500 bg-green-50"
-                        : "border-gray-200 bg-white hover:border-green-500"
-                    }`}
+                    className="group w-full rounded-xl border-2 border-gray-200 bg-white p-5 text-left transition-all hover:border-green-500 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -171,86 +144,15 @@ export default function PriceSelectionModal({ isOpen, onClose, product }) {
                   </button>
                 </div>
 
-                {/* Quantity Selector */}
-                {selectedPriceType && (
-                  <div className="px-6 pb-6 space-y-3">
-                    <div className="border-t border-gray-200 pt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Cantidad
-                      </label>
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={decrementQuantity}
-                          disabled={quantity <= 1}
-                          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          <MinusIcon className="h-5 w-5" />
-                        </button>
-                        <input
-                          type="number"
-                          value={quantity}
-                          onChange={handleQuantityChange}
-                          min="1"
-                          max={product.stock}
-                          className="h-10 w-20 rounded-lg border-2 border-gray-300 text-center text-lg font-semibold focus:border-primary-500 focus:outline-none"
-                        />
-                        <button
-                          onClick={incrementQuantity}
-                          disabled={quantity >= product.stock}
-                          className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          <PlusIcon className="h-5 w-5" />
-                        </button>
-                        <div className="flex-1 text-right">
-                          <p className="text-sm text-gray-500">
-                            Disponible: <span className="font-medium text-gray-700">{product.stock}</span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Total */}
-                    <div className="rounded-lg bg-gradient-to-r from-primary-50 to-blue-50 p-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">Total:</span>
-                        <span className="text-2xl font-bold text-primary-600">
-                          {formatCurrency(
-                            (selectedPriceType === "list" ? product.price_list : product.price_cash) * quantity
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* Footer */}
                 <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
-                  {selectedPriceType ? (
-                    <div className="flex space-x-3">
-                      <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="flex-1 bg-transparent"
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        variant="primary"
-                        onClick={handleAddToCart}
-                        className="flex-1"
-                      >
-                        Agregar al Carrito
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      onClick={onClose}
-                      className="w-full bg-transparent"
-                    >
-                      Cancelar
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    onClick={onClose}
+                    className="w-full bg-transparent"
+                  >
+                    Cancelar
+                  </Button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
