@@ -7,7 +7,7 @@ import { useSalesStore } from "../../stores/salesStore"
 import { formatCurrency, formatStock } from "../../lib/formatters"
 import Button from "../common/Button"
 import PriceSelectionModal from "./PriceSelectionModal"
-import QuantitySelectionModal from "./QuantitySelectionModal" // Import QuantitySelectionModal
+import QuantitySelectionModal from "./QuantityModal" // Import QuantitySelectionModal
 import {
   MagnifyingGlassIcon,
   ChevronUpIcon,
