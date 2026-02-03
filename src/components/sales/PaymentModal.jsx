@@ -903,60 +903,71 @@ const PaymentModal = () => {
                                 />
                               </div>
 
-                              <div className="space-y-3">
-                                {/* Campos de cuotas e interés */}
-                                <div className="grid grid-cols-2 gap-3">
-                                  <div>
-                                    <label className="block text-xs font-medium text-purple-800 mb-1">Cuotas</label>
-                                    <input
-                                      type="number"
-                                      min="1"
-                                      max="24"
-                                      value={paymentData.installments}
-                                      onChange={(e) =>
-                                        setPaymentData({
-                                          ...paymentData,
-                                          installments: Math.max(1, Number.parseInt(e.target.value) || 1),
-                                        })
-                                      }
-                                      className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-center"
-                                    />
+                              {paymentMethod === PAYMENT_METHODS.TARJETA_CREDITO && (
+                                <div className="space-y-3">
+                                  {/* Campos de cuotas e interés */}
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-xs font-medium text-purple-800 mb-1">Cuotas</label>
+                                      <input
+                                        type="number"
+                                        min="1"
+                                        max="24"
+                                        value={paymentData.installments}
+                                        onChange={(e) =>
+                                          setPaymentData({
+                                            ...paymentData,
+                                            installments: Math.max(1, Number.parseInt(e.target.value) || 1),
+                                          })
+                                        }
+                                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-center"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-medium text-purple-800 mb-1">
+                                        Interés (%)
+                                      </label>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        step="0.1"
+                                        value={paymentData.interestRate}
+                                        onChange={(e) =>
+                                          setPaymentData({
+                                            ...paymentData,
+                                            interestRate: Math.max(0, Number.parseFloat(e.target.value) || 0),
+                                          })
+                                        }
+                                        className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-center"
+                                        placeholder="0"
+                                      />
+                                    </div>
                                   </div>
-                                  <div>
-                                    <label className="block text-xs font-medium text-purple-800 mb-1">
-                                      Interés (%)
-                                    </label>
-                                    <input
-                                      type="number"
-                                      min="0"
-                                      max="100"
-                                      step="0.1"
-                                      value={paymentData.interestRate}
-                                      onChange={(e) =>
-                                        setPaymentData({
-                                          ...paymentData,
-                                          interestRate: Math.max(0, Number.parseFloat(e.target.value) || 0),
-                                        })
-                                      }
-                                      className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-center"
-                                      placeholder="0"
-                                    />
-                                  </div>
-                                </div>
 
-                                {/* Resumen de cuotas */}
-                                {paymentData.installments > 1 && (
-                                  <div className="bg-white rounded-lg p-3 border border-purple-200">
-                                    <div className="grid grid-cols-2 gap-3 text-center">
-                                      <div>
-                                        <p className="text-xs text-purple-700">Total con interés</p>
-                                        <p className="font-semibold text-purple-900">
-                                          {formatCurrency(finalTotal * (1 + paymentData.interestRate / 100))}
-                                        </p>
+                                  {/* Resumen de cuotas */}
+                                  {paymentData.installments > 1 && (
+                                    <div className="bg-white rounded-lg p-3 border border-purple-200">
+                                      <div className="grid grid-cols-2 gap-3 text-center">
+                                        <div>
+                                          <p className="text-xs text-purple-700">Total con interés</p>
+                                          <p className="font-semibold text-purple-900">
+                                            {formatCurrency(finalTotal * (1 + paymentData.interestRate / 100))}
+                                          </p>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs text-purple-700">Por cuota</p>
+                                          <p className="font-semibold text-purple-900">
+                                            {formatCurrency(
+                                              (finalTotal * (1 + paymentData.interestRate / 100)) /
+                                                paymentData.installments,
+                                            )}
+                                          </p>
+                                        </div>
                                       </div>
-                                      <div>
-                                        <p className="text-xs text-purple-700">Por cuota</p>
-                                        <p className="font-semibold text-purple-900">
+                                      <div className="mt-2 text-center">
+                                        <p className="text-xs text-purple-600">
+                                          {paymentData.installments} cuotas de{" "}
                                           {formatCurrency(
                                             (finalTotal * (1 + paymentData.interestRate / 100)) /
                                               paymentData.installments,
@@ -964,18 +975,9 @@ const PaymentModal = () => {
                                         </p>
                                       </div>
                                     </div>
-                                    <div className="mt-2 text-center">
-                                      <p className="text-xs text-purple-600">
-                                        {paymentData.installments} cuotas de{" "}
-                                        {formatCurrency(
-                                          (finalTotal * (1 + paymentData.interestRate / 100)) /
-                                            paymentData.installments,
-                                        )}
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           )}
 
