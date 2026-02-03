@@ -229,6 +229,21 @@ const ProductList = ({ searchTerm, selectedIndex = -1 }) => {
                               </div>
                             )}
 
+                            {(product.size || product.color) && (
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                                {product.size && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                    Talle: {product.size}
+                                  </span>
+                                )}
+                                {product.color && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-pink-700 border border-pink-100">
+                                    Color: {product.color}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
                             {product.barcode && (
                               <div
                                 className="text-xs text-gray-400 font-mono truncate"
