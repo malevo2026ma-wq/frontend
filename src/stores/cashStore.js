@@ -101,13 +101,12 @@ export const useCashStore = create(
               totalEgresosDia: Number(sessionData.total_egresos_dia || 0),
               gananciaNeta: Number(sessionData.ganancia_neta_dia || 0),
 
-              // Desglose
+              // Desglose (crédito y débito por separado; no usar total como fallback para evitar duplicar)
               ventasEfectivo: Number(sessionData.ventas_efectivo || 0),
-              ventasTarjetaCredito: Number(sessionData.ventas_tarjeta_credito || sessionData.ventas_tarjeta || 0),
-              ventasTarjetaDebito: Number(sessionData.ventas_tarjeta_debito || 0),
+              ventasTarjetaCredito: Number(sessionData.ventas_tarjeta_credito ?? 0),
+              ventasTarjetaDebito: Number(sessionData.ventas_tarjeta_debito ?? 0),
               ventasTarjeta: Number(
-                (sessionData.ventas_tarjeta_credito || 0) +
-                  (sessionData.ventas_tarjeta_debito || 0) ||
+                (Number(sessionData.ventas_tarjeta_credito ?? 0) + Number(sessionData.ventas_tarjeta_debito ?? 0)) ||
                   sessionData.ventas_tarjeta ||
                   0,
               ),

@@ -551,8 +551,20 @@ const CashSessionDetails = ({ isOpen, session, onClose }) => {
                                 </div>
                                 <p className="text-sm text-blue-700 font-medium">Tarjeta</p>
                                 <p className="text-2xl font-bold text-blue-800">
-                                  {formatCurrency(earnings.sales?.card || 0)}
+                                  {formatCurrency(earnings.sales?.card ?? (earnings.sales?.card_credit ?? 0) + (earnings.sales?.card_debit ?? 0) || 0)}
                                 </p>
+                                {(earnings.sales?.card_credit != null || earnings.sales?.card_debit != null) && (
+                                  <div className="mt-2 text-xs text-blue-700 space-y-1">
+                                    <div className="flex justify-between">
+                                      <span>Crédito:</span>
+                                      <span className="font-semibold">{formatCurrency(earnings.sales?.card_credit ?? 0)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Débito:</span>
+                                      <span className="font-semibold">{formatCurrency(earnings.sales?.card_debit ?? 0)}</span>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
 
                               <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
